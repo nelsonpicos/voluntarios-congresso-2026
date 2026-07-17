@@ -204,7 +204,7 @@
             border-left: 3px solid #27ae60;
         }
 
-        /* MODAL DE LIMPEZA */
+        /* MODAL LIMPEZA */
         .modal-limpar {
             display: none;
             position: fixed;
@@ -280,7 +280,7 @@
             box-shadow: 0 0 0 2px #e74c3c;
         }
 
-        /* MODAL DE DETALHES (VISUALIZAR VOLUNTÁRIO) */
+        /* MODAL DETALHES */
         .modal-detalhes {
             display: none;
             position: fixed;
@@ -582,14 +582,15 @@
             transform: scale(1.02);
         }
 
-        /* Vaga preenchida para ADMIN - com botões */
+        /* Vaga preenchida para ADMIN - com botões lado a lado */
         .vaga-item.vaga-admin {
             background: #d5f5e3;
             border-color: #8e44ad;
             cursor: default;
-            padding: 2px 4px;
+            padding: 4px 6px;
             gap: 4px;
             justify-content: space-between;
+            flex-wrap: nowrap; /* NUNCA QUEBRAR LINHA */
         }
         .vaga-item.vaga-admin .btn-admin-ver {
             background: #3498db;
@@ -602,6 +603,7 @@
             transition: all 0.2s;
             line-height: 1.4;
             flex-shrink: 0;
+            order: 0;
         }
         .vaga-item.vaga-admin .btn-admin-ver:hover {
             background: #2980b9;
@@ -618,21 +620,23 @@
             transition: all 0.2s;
             line-height: 1.4;
             flex-shrink: 0;
+            order: 2;
         }
         .vaga-item.vaga-admin .btn-admin-limpar:hover {
             background: #c0392b;
             transform: scale(1.05);
         }
         .vaga-item.vaga-admin .vaga-nome-admin {
-            flex: 1;
+            flex: 1 1 auto;
             text-align: center;
             font-weight: 500;
             font-size: 0.85em;
-        }
-
-        /* Vaga disponível para admin também fica clicável normalmente */
-        .vaga-item.disponivel.admin-pode-ocupar {
-            cursor: pointer;
+            order: 1;
+            min-width: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding: 0 2px;
         }
 
         /* Loading */
@@ -652,7 +656,10 @@
         }
 
         /* Responsivo */
-        @media (max-width: 1024px) { .turnos-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 1024px) { 
+            .turnos-grid { grid-template-columns: repeat(2, 1fr); } 
+        }
+        
         @media (max-width: 600px) {
             .turnos-grid { grid-template-columns: 1fr; }
             .container { padding: 15px; }
@@ -665,19 +672,31 @@
             }
             .login-form { padding: 20px; }
             .dia-title { flex-direction: column; text-align: center; }
+            
+            /* 🔥 CORREÇÃO: botões lado a lado no celular 🔥 */
             .vaga-item.vaga-admin {
-                flex-wrap: wrap;
-                gap: 2px;
+                flex-wrap: nowrap !important; /* Força uma linha */
+                gap: 4px;
+                padding: 4px 6px;
             }
             .vaga-item.vaga-admin .vaga-nome-admin {
-                flex: 1 1 100%;
-                order: 1;
+                flex: 1 1 auto;
+                order: 0 !important;
+                font-size: 0.7em;
+                text-align: center;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                min-width: 0;
+                padding: 0 2px;
             }
-            .vaga-item.vaga-admin .btn-admin-ver {
-                order: 0;
-            }
+            .vaga-item.vaga-admin .btn-admin-ver,
             .vaga-item.vaga-admin .btn-admin-limpar {
-                order: 2;
+                order: 0 !important;
+                flex-shrink: 0;
+                font-size: 0.65em;
+                padding: 2px 5px;
+                line-height: 1.4;
             }
         }
 
@@ -865,7 +884,7 @@
         // ESTADO
         // ============================================
         let usuarioAtual = null, vagasData = {}, meuUid = null, isProprietario = false, opcaoLimpezaSelecionada = 'todos';
-        let detalhesAtual = null; // {dia, turnoIndex, vagaIndex}
+        let detalhesAtual = null;
 
         // ============================================
         // DOM ELEMENTS
@@ -903,7 +922,6 @@
         const btnCancelProp = document.getElementById('btnCancelProp');
         const mensagemModal = document.getElementById('mensagemModal');
         const cadeadoBtn = document.getElementById('cadeadoBtn');
-        // Modal de detalhes
         const modalDetalhes = document.getElementById('modalDetalhes');
         const detNome = document.getElementById('detNome');
         const detTelefone = document.getElementById('detTelefone');
@@ -956,7 +974,7 @@
         }
 
         // ============================================
-        // RENDERIZAR VAGAS (COM BOTÕES PARA ADMIN)
+        // RENDERIZAR VAGAS
         // ============================================
         function renderizarVagas() {
             let html = '';
@@ -988,7 +1006,6 @@
                             const isProp = usuarioAtual && usuarioAtual.isProprietario;
 
                             if (isProp) {
-                                // ADMIN: exibe botões
                                 classe += ' vaga-admin';
                                 const nomeVoluntario = vaga.nome || 'Voluntário';
                                 htmlInterno = `
@@ -996,7 +1013,6 @@
                                     <span class="vaga-nome-admin">✅ ${nomeVoluntario}</span>
                                     <button class="btn-admin-limpar" data-dia="${dia}" data-turno="${turnoIndex}" data-vaga="${v}" title="Limpar vaga">🗑️</button>
                                 `;
-                                // Atributos data para eventos delegados
                                 classe += ' admin-item';
                             } else if (isMinha) {
                                 classe += ' preenchida-por-mim';
@@ -1378,10 +1394,9 @@
         }
 
         // ============================================
-        // EVENTOS (DELEGADOS PARA BOTÕES ADMIN)
+        // EVENTOS (DELEGADOS)
         // ============================================
         document.addEventListener('click', function(e) {
-            // Botão ver detalhes
             const verBtn = e.target.closest('.btn-admin-ver');
             if (verBtn) {
                 e.preventDefault();
@@ -1391,7 +1406,6 @@
                 verDetalhesVaga(dia, turno, vaga);
                 return;
             }
-            // Botão limpar (admin)
             const limparBtn = e.target.closest('.btn-admin-limpar');
             if (limparBtn) {
                 e.preventDefault();
@@ -1403,7 +1417,6 @@
             }
         });
 
-        // Fechar modal de detalhes
         btnFecharDetalhes.addEventListener('click', function() {
             modalDetalhes.classList.remove('show');
         });
@@ -1461,7 +1474,6 @@
             });
         });
 
-        // Expor funções para onclick (ainda usado para ocupar/liberar)
         window.ocuparVaga = ocuparVaga;
         window.liberarVaga = liberarVaga;
         window.liberarVagaAdmin = liberarVagaAdmin;
