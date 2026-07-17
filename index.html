@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Voluntários - Congresso 2026</title>
     
-    <!-- FORÇA O NAVEGADOR A NÃO USAR CACHE -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -737,7 +736,7 @@
                 <div class="form-group">
                     <label>TELEFONE <span class="required">*</span></label>
                     <input type="text" id="telefoneInput" class="telefone-mask" 
-                           placeholder="(86) 9.9850-2160" maxlength="16">
+                           placeholder="(99) 9.9999-9999" maxlength="16">
                 </div>
 
                 <div class="status-usuario" id="statusUsuario"></div>
@@ -828,6 +827,7 @@
         let isProprietario = false;
         let opcaoLimpezaSelecionada = 'todos';
         let dadosUsuario = null;
+        let chaveUsuario = null;
 
         // ============================================
         // DOM ELEMENTS
@@ -899,7 +899,7 @@
         }
 
         // ============================================
-        // BUSCAR USUÁRIO POR TELEFONE
+        // BUSCAR USUÁRIO NO FIREBASE
         // ============================================
         function buscarUsuarioPorTelefone(telefone) {
             const telefoneLimpo = limparMascara(telefone);
@@ -919,9 +919,8 @@
                 .then((snapshot) => {
                     if (snapshot.exists()) {
                         const dados = snapshot.val();
-                        const chave = Object.keys(dados)[0];
-                        dadosUsuario = dados[chave];
-                        dadosUsuario.chave = chave;
+                        chaveUsuario = Object.keys(dados)[0];
+                        dadosUsuario = dados[chaveUsuario];
                         
                         nomeInput.value = dadosUsuario.nome || '';
                         congregacaoInput.value = dadosUsuario.congregacao || '';
@@ -932,9 +931,8 @@
                         statusUsuario.className = 'status-usuario show existente';
                         statusUsuario.textContent = `✅ Bem-vindo de volta, ${dadosUsuario.nome || 'voluntário'}! Você pode editar seus dados se necessário.`;
                         telefoneInput.className = 'telefone-mask encontrado';
-                        
-                        showMessage('✅ Usuário encontrado! Preencha ou edite os dados e clique em ENTRAR.', 'success');
                     } else {
+                        chaveUsuario = null;
                         dadosUsuario = null;
                         nomeInput.disabled = false;
                         congregacaoInput.disabled = false;
@@ -945,8 +943,6 @@
                         statusUsuario.className = 'status-usuario show novo';
                         statusUsuario.textContent = '🆕 Novo usuário! Preencha seus dados para começar.';
                         telefoneInput.className = 'telefone-mask nao-encontrado';
-                        
-                        showMessage('📝 Novo usuário! Preencha seus dados e clique em ENTRAR.', 'info');
                     }
                 })
                 .catch((error) => {
@@ -959,29 +955,9 @@
         // EVENTO DE DIGITAÇÃO DO TELEFONE
         // ============================================
         telefoneInput.addEventListener('input', function(e) {
-            const valorAtual = this.value;
-            const apenasNumeros = limparMascara(valorAtual);
-            
-            // Se o usuário está apagando, não força formatação
-            if (valorAtual.length < this.dataset.ultimoTamanho || apenasNumeros.length < 10) {
-                this.dataset.ultimoTamanho = valorAtual.length;
-                this.value = formatarTelefone(apenasNumeros);
-                telefoneAtual = this.value;
-                buscarUsuarioPorTelefone(this.value);
-                return;
-            }
-            
+            const apenasNumeros = limparMascara(this.value);
             this.value = formatarTelefone(apenasNumeros);
-            this.dataset.ultimoTamanho = this.value.length;
-            telefoneAtual = this.value;
             buscarUsuarioPorTelefone(this.value);
-        });
-
-        telefoneInput.addEventListener('keydown', function(e) {
-            // Se estiver apagando, não formata
-            if (e.key === 'Backspace' || e.key === 'Delete') {
-                this.dataset.deletando = 'true';
-            }
         });
 
         // ============================================
@@ -1143,7 +1119,7 @@
         }
 
         // ============================================
-        // LIBERAR VAGA (USUÁRIO COMUM - PRÓPRIA VAGA)
+        // LIBERAR VAGA
         // ============================================
         function liberarVaga(dia, turnoIndex, vagaIndex) {
             if (isProprietario) {
@@ -1315,8 +1291,8 @@
         function salvarUsuario(telefone, nome, congregacao) {
             const telefoneLimpo = limparMascara(telefone);
             
-            if (dadosUsuario && dadosUsuario.chave) {
-                return database.ref(`usuarios/${dadosUsuario.chave}`).update({
+            if (chaveUsuario && dadosUsuario) {
+                return database.ref(`usuarios/${chaveUsuario}`).update({
                     nome: nome,
                     congregacao: congregacao,
                     ultimo_acesso: new Date().toISOString()
@@ -1424,6 +1400,7 @@
             meuUid = null;
             isProprietario = false;
             dadosUsuario = null;
+            chaveUsuario = null;
             
             loginScreen.classList.remove('hidden');
             mainContent.classList.remove('show');
@@ -1511,9 +1488,8 @@
                         .then((snapshot) => {
                             if (snapshot.exists()) {
                                 const dados = snapshot.val();
-                                const chave = Object.keys(dados)[0];
-                                dadosUsuario = dados[chave];
-                                dadosUsuario.chave = chave;
+                                chaveUsuario = Object.keys(dados)[0];
+                                dadosUsuario = dados[chaveUsuario];
                             }
                             loginScreen.classList.add('hidden');
                             mainContent.classList.add('show');
