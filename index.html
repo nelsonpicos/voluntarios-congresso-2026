@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Voluntários - Congresso 2026</title>
     
-    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     
@@ -538,10 +537,10 @@
             transition: all 0.2s;
             padding: 4px 6px;
             font-size: 0.85em;
+            cursor: pointer;
         }
 
         .vaga-item.disponivel {
-            cursor: pointer;
             background: #f8f9fa;
             border-color: #dee2e6;
             color: #6c757d;
@@ -942,11 +941,12 @@
                 vagasData = snapshot.val() || {};
                 renderizarVagas();
                 atualizarStats();
+                adicionarEventosVagas();
             });
         }
 
         // ============================================
-        // RENDERIZAR VAGAS (COM ONCLICK DIRETO)
+        // RENDERIZAR VAGAS (COM ID ÚNICO)
         // ============================================
         function renderizarVagas() {
             let html = '';
@@ -967,10 +967,12 @@
                         const vaga = turnoData[`vaga${v}`] || null;
                         total++;
 
+                        // 🔥 ID ÚNICO para cada vaga
+                        const idVaga = `vaga-${dia}-${turnoIndex}-${v}`;
+                        
                         let classe = 'vaga-item';
                         let displayText = '';
                         let htmlInterno = '';
-                        let onClick = '';
 
                         if (vaga) {
                             preenchidas++;
@@ -978,7 +980,6 @@
                             const isProp = usuarioAtual && usuarioAtual.isProprietario;
 
                             if (isProp) {
-                                // ADMIN: botões
                                 classe += ' vaga-admin';
                                 const nomeVoluntario = vaga.nome || 'Voluntário';
                                 htmlInterno = `
@@ -991,25 +992,22 @@
                                 classe += ' preenchida-por-mim';
                                 displayText = `👤 ${vaga.nome}`;
                                 minhas++;
-                                onClick = `onclick="liberarVaga('${dia}', ${turnoIndex}, ${v})"`;
                             } else {
                                 classe += ' preenchida';
                                 displayText = `✅ ${vaga.nome}`;
                             }
                         } else {
-                            // VAGA DISPONÍVEL
                             classe += ' disponivel';
                             if (isProprietario) {
                                 displayText = `📋 Vaga ${v+1}`;
                             } else if (usuarioAtual) {
                                 displayText = `📋 Vaga ${v+1}`;
-                                onClick = `onclick="ocuparVaga('${dia}', ${turnoIndex}, ${v})"`;
                             } else {
                                 displayText = `🔒 Vaga ${v+1}`;
                             }
                         }
 
-                        html += `<div class="${classe}" ${onClick} data-dia="${dia}" data-turno="${turnoIndex}" data-vaga="${v}">`;
+                        html += `<div id="${idVaga}" class="${classe}" data-dia="${dia}" data-turno="${turnoIndex}" data-vaga="${v}">`;
                         if (htmlInterno) {
                             html += htmlInterno;
                         } else {
@@ -1023,6 +1021,49 @@
             });
 
             vagasContent.innerHTML = html;
+        }
+
+        // ============================================
+        // ADICIONAR EVENTOS DE CLIQUE NAS VAGAS
+        // ============================================
+        function adicionarEventosVagas() {
+            // Remove eventos antigos (evita duplicação)
+            document.querySelectorAll('.vaga-item.disponivel, .vaga-item.preenchida-por-mim').forEach(el => {
+                el.removeEventListener('click', handleVagaClick);
+                el.addEventListener('click', handleVagaClick);
+            });
+        }
+
+        function handleVagaClick(event) {
+            const el = event.currentTarget;
+            const dia = el.dataset.dia;
+            const turno = parseInt(el.dataset.turno);
+            const vaga = parseInt(el.dataset.vaga);
+            
+            console.log('Clique detectado!', dia, turno, vaga);
+            
+            if (!dia || isNaN(turno) || isNaN(vaga)) {
+                console.log('Dados inválidos');
+                return;
+            }
+
+            // Verifica se é administrador
+            if (isProprietario) {
+                showMessage('Administrador não pode ocupar vagas. Use os botões 👁️ e 🗑️.', 'warning');
+                return;
+            }
+
+            if (!usuarioAtual) {
+                showMessage('Você precisa se identificar primeiro!', 'error');
+                return;
+            }
+
+            // Verifica se é uma vaga disponível ou "minha vaga"
+            if (el.classList.contains('disponivel')) {
+                ocuparVaga(dia, turno, vaga);
+            } else if (el.classList.contains('preenchida-por-mim')) {
+                liberarVaga(dia, turno, vaga);
+            }
         }
 
         // ============================================
@@ -1255,6 +1296,7 @@
             atualizarUI();
             showMessage(`✅ Bem-vindo(a), ${nome}!`, 'success');
             renderizarVagas();
+            adicionarEventosVagas();
         }
 
         function fazerLogout() {
@@ -1299,6 +1341,7 @@
                 atualizarUI();
                 showMessage('👑 Modo Proprietário ativado!', 'success');
                 renderizarVagas();
+                adicionarEventosVagas();
             } else {
                 mensagemModal.className = 'mensagem-modal erro';
                 mensagemModal.textContent = '⚠️ E-mail ou senha incorretos!';
@@ -1356,6 +1399,7 @@
                     mainContent.classList.add('show');
                     atualizarUI();
                     renderizarVagas();
+                    adicionarEventosVagas();
                 } catch (e) {
                     localStorage.removeItem('usuarioVoluntario');
                     localStorage.removeItem('meuUid');
@@ -1420,7 +1464,7 @@
         });
 
         // ============================================
-        // EXPOR FUNÇÕES PARA ONCLICK
+        // EXPOR FUNÇÕES
         // ============================================
         window.ocuparVaga = ocuparVaga;
         window.liberarVaga = liberarVaga;
@@ -1450,6 +1494,7 @@
                 localStorage.setItem('isProprietario', 'false');
                 atualizarUI();
                 renderizarVagas();
+                adicionarEventosVagas();
                 showMessage('👑 Modo proprietário desativado', 'info');
             } else {
                 abrirModal();
