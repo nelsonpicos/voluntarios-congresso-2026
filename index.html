@@ -941,12 +941,11 @@
                 vagasData = snapshot.val() || {};
                 renderizarVagas();
                 atualizarStats();
-                adicionarEventosVagas();
             });
         }
 
         // ============================================
-        // RENDERIZAR VAGAS (COM ID ÚNICO)
+        // RENDERIZAR VAGAS COM onclick DIRETO
         // ============================================
         function renderizarVagas() {
             let html = '';
@@ -967,12 +966,10 @@
                         const vaga = turnoData[`vaga${v}`] || null;
                         total++;
 
-                        // 🔥 ID ÚNICO para cada vaga
-                        const idVaga = `vaga-${dia}-${turnoIndex}-${v}`;
-                        
                         let classe = 'vaga-item';
                         let displayText = '';
                         let htmlInterno = '';
+                        let onclickAttr = '';
 
                         if (vaga) {
                             preenchidas++;
@@ -980,6 +977,7 @@
                             const isProp = usuarioAtual && usuarioAtual.isProprietario;
 
                             if (isProp) {
+                                // ADMIN: botões
                                 classe += ' vaga-admin';
                                 const nomeVoluntario = vaga.nome || 'Voluntário';
                                 htmlInterno = `
@@ -992,22 +990,26 @@
                                 classe += ' preenchida-por-mim';
                                 displayText = `👤 ${vaga.nome}`;
                                 minhas++;
+                                onclickAttr = `onclick="liberarVaga('${dia}',${turnoIndex},${v})"`;
                             } else {
                                 classe += ' preenchida';
                                 displayText = `✅ ${vaga.nome}`;
                             }
                         } else {
+                            // VAGA DISPONÍVEL
                             classe += ' disponivel';
                             if (isProprietario) {
                                 displayText = `📋 Vaga ${v+1}`;
                             } else if (usuarioAtual) {
                                 displayText = `📋 Vaga ${v+1}`;
+                                onclickAttr = `onclick="ocuparVaga('${dia}',${turnoIndex},${v})"`;
                             } else {
                                 displayText = `🔒 Vaga ${v+1}`;
                             }
                         }
 
-                        html += `<div id="${idVaga}" class="${classe}" data-dia="${dia}" data-turno="${turnoIndex}" data-vaga="${v}">`;
+                        // 🔥 CORREÇÃO: onclick DIRETO no HTML
+                        html += `<div class="${classe}" ${onclickAttr} data-dia="${dia}" data-turno="${turnoIndex}" data-vaga="${v}">`;
                         if (htmlInterno) {
                             html += htmlInterno;
                         } else {
@@ -1021,49 +1023,6 @@
             });
 
             vagasContent.innerHTML = html;
-        }
-
-        // ============================================
-        // ADICIONAR EVENTOS DE CLIQUE NAS VAGAS
-        // ============================================
-        function adicionarEventosVagas() {
-            // Remove eventos antigos (evita duplicação)
-            document.querySelectorAll('.vaga-item.disponivel, .vaga-item.preenchida-por-mim').forEach(el => {
-                el.removeEventListener('click', handleVagaClick);
-                el.addEventListener('click', handleVagaClick);
-            });
-        }
-
-        function handleVagaClick(event) {
-            const el = event.currentTarget;
-            const dia = el.dataset.dia;
-            const turno = parseInt(el.dataset.turno);
-            const vaga = parseInt(el.dataset.vaga);
-            
-            console.log('Clique detectado!', dia, turno, vaga);
-            
-            if (!dia || isNaN(turno) || isNaN(vaga)) {
-                console.log('Dados inválidos');
-                return;
-            }
-
-            // Verifica se é administrador
-            if (isProprietario) {
-                showMessage('Administrador não pode ocupar vagas. Use os botões 👁️ e 🗑️.', 'warning');
-                return;
-            }
-
-            if (!usuarioAtual) {
-                showMessage('Você precisa se identificar primeiro!', 'error');
-                return;
-            }
-
-            // Verifica se é uma vaga disponível ou "minha vaga"
-            if (el.classList.contains('disponivel')) {
-                ocuparVaga(dia, turno, vaga);
-            } else if (el.classList.contains('preenchida-por-mim')) {
-                liberarVaga(dia, turno, vaga);
-            }
         }
 
         // ============================================
@@ -1296,7 +1255,6 @@
             atualizarUI();
             showMessage(`✅ Bem-vindo(a), ${nome}!`, 'success');
             renderizarVagas();
-            adicionarEventosVagas();
         }
 
         function fazerLogout() {
@@ -1341,7 +1299,6 @@
                 atualizarUI();
                 showMessage('👑 Modo Proprietário ativado!', 'success');
                 renderizarVagas();
-                adicionarEventosVagas();
             } else {
                 mensagemModal.className = 'mensagem-modal erro';
                 mensagemModal.textContent = '⚠️ E-mail ou senha incorretos!';
@@ -1399,7 +1356,6 @@
                     mainContent.classList.add('show');
                     atualizarUI();
                     renderizarVagas();
-                    adicionarEventosVagas();
                 } catch (e) {
                     localStorage.removeItem('usuarioVoluntario');
                     localStorage.removeItem('meuUid');
@@ -1464,7 +1420,7 @@
         });
 
         // ============================================
-        // EXPOR FUNÇÕES
+        // EXPOR FUNÇÕES PARA O ONCLICK
         // ============================================
         window.ocuparVaga = ocuparVaga;
         window.liberarVaga = liberarVaga;
@@ -1494,7 +1450,6 @@
                 localStorage.setItem('isProprietario', 'false');
                 atualizarUI();
                 renderizarVagas();
-                adicionarEventosVagas();
                 showMessage('👑 Modo proprietário desativado', 'info');
             } else {
                 abrirModal();
