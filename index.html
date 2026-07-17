@@ -49,14 +49,8 @@
             transition: all 0.3s;
             color: #95a5a6;
         }
-        .cadeado-btn:hover {
-            background: #ecf0f1;
-            color: #2c3e50;
-        }
-        .cadeado-btn.proprietario {
-            color: #e67e22;
-            background: #fef9e7;
-        }
+        .cadeado-btn:hover { background: #ecf0f1; color: #2c3e50; }
+        .cadeado-btn.proprietario { color: #e67e22; background: #fef9e7; }
         
         .btn-limpar-geral {
             display: none;
@@ -70,13 +64,8 @@
             cursor: pointer;
             transition: all 0.3s;
         }
-        .btn-limpar-geral:hover {
-            background: #c0392b;
-            transform: scale(1.05);
-        }
-        .btn-limpar-geral.visible {
-            display: inline-block;
-        }
+        .btn-limpar-geral:hover { background: #c0392b; transform: scale(1.05); }
+        .btn-limpar-geral.visible { display: inline-block; }
         
         .modal-overlay {
             display: none;
@@ -90,9 +79,7 @@
             justify-content: center;
             align-items: center;
         }
-        .modal-overlay.show {
-            display: flex;
-        }
+        .modal-overlay.show { display: flex; }
         .modal-box {
             background: white;
             padding: 30px;
@@ -101,16 +88,8 @@
             width: 90%;
             box-shadow: 0 10px 40px rgba(0,0,0,0.3);
         }
-        .modal-box h3 {
-            color: #2c3e50;
-            margin-bottom: 10px;
-            font-size: 1.2em;
-        }
-        .modal-box p {
-            color: #7f8c8d;
-            font-size: 0.9em;
-            margin-bottom: 15px;
-        }
+        .modal-box h3 { color: #2c3e50; margin-bottom: 10px; font-size: 1.2em; }
+        .modal-box p { color: #7f8c8d; font-size: 0.9em; margin-bottom: 15px; }
         .modal-box input {
             width: 100%;
             padding: 10px 12px;
@@ -120,23 +99,14 @@
             margin-bottom: 10px;
             transition: border-color 0.3s;
         }
-        .modal-box input:focus {
-            outline: none;
-            border-color: #3498db;
-        }
-        .modal-box input.error {
-            border-color: #e74c3c;
-            background: #fdf2f2;
-        }
+        .modal-box input:focus { outline: none; border-color: #3498db; }
+        .modal-box input.error { border-color: #e74c3c; background: #fdf2f2; }
         .modal-box .input-senha-wrapper {
             position: relative;
             width: 100%;
             margin-bottom: 10px;
         }
-        .modal-box .input-senha-wrapper input {
-            padding-right: 40px;
-            margin-bottom: 0;
-        }
+        .modal-box .input-senha-wrapper input { padding-right: 40px; margin-bottom: 0; }
         .modal-box .toggle-senha {
             position: absolute;
             right: 10px;
@@ -148,9 +118,7 @@
             opacity: 0.6;
             transition: opacity 0.3s;
         }
-        .modal-box .toggle-senha:hover {
-            opacity: 1;
-        }
+        .modal-box .toggle-senha:hover { opacity: 1; }
         .modal-box .btn-login-prop {
             background: #e67e22;
             color: white;
@@ -163,9 +131,7 @@
             width: 100%;
             transition: background 0.3s;
         }
-        .modal-box .btn-login-prop:hover {
-            background: #d35400;
-        }
+        .modal-box .btn-login-prop:hover { background: #d35400; }
         .modal-box .btn-cancel {
             background: #95a5a6;
             color: white;
@@ -178,9 +144,7 @@
             margin-top: 8px;
             transition: background 0.3s;
         }
-        .modal-box .btn-cancel:hover {
-            background: #7f8c8d;
-        }
+        .modal-box .btn-cancel:hover { background: #7f8c8d; }
         .modal-box .mensagem-modal {
             padding: 8px 12px;
             border-radius: 4px;
@@ -188,18 +152,8 @@
             font-size: 0.9em;
             display: none;
         }
-        .modal-box .mensagem-modal.erro {
-            display: block;
-            background: #fdf2f2;
-            color: #c0392b;
-            border-left: 3px solid #e74c3c;
-        }
-        .modal-box .mensagem-modal.sucesso {
-            display: block;
-            background: #f0faf0;
-            color: #1e8449;
-            border-left: 3px solid #27ae60;
-        }
+        .modal-box .mensagem-modal.erro { display: block; background: #fdf2f2; color: #c0392b; border-left: 3px solid #e74c3c; }
+        .modal-box .mensagem-modal.sucesso { display: block; background: #f0faf0; color: #1e8449; border-left: 3px solid #27ae60; }
 
         .modal-limpar {
             display: none;
@@ -213,12 +167,8 @@
             justify-content: center;
             align-items: center;
         }
-        .modal-limpar.show {
-            display: flex;
-        }
-        .modal-limpar .modal-box {
-            max-width: 450px;
-        }
+        .modal-limpar.show { display: flex; }
+        .modal-limpar .modal-box { max-width: 450px; }
         .modal-limpar .modal-box .btn-danger {
             background: #e74c3c;
             color: white;
@@ -232,9 +182,7 @@
             transition: background 0.3s;
             margin-top: 5px;
         }
-        .modal-limpar .modal-box .btn-danger:hover {
-            background: #c0392b;
-        }
+        .modal-limpar .modal-box .btn-danger:hover { background: #c0392b; }
         .modal-limpar .modal-box .btn-secondary {
             background: #95a5a6;
             color: white;
@@ -247,9 +195,7 @@
             margin-top: 8px;
             transition: background 0.3s;
         }
-        .modal-limpar .modal-box .btn-secondary:hover {
-            background: #7f8c8d;
-        }
+        .modal-limpar .modal-box .btn-secondary:hover { background: #7f8c8d; }
         .modal-limpar .modal-box .opcoes-limpar {
             display: flex;
             flex-direction: column;
@@ -266,15 +212,8 @@
             text-align: center;
             font-weight: 500;
         }
-        .modal-limpar .modal-box .opcao-limpar:hover {
-            border-color: #e74c3c;
-            background: #fdf2f2;
-        }
-        .modal-limpar .modal-box .opcao-limpar.selecionada {
-            border-color: #e74c3c;
-            background: #fdf2f2;
-            box-shadow: 0 0 0 2px #e74c3c;
-        }
+        .modal-limpar .modal-box .opcao-limpar:hover { border-color: #e74c3c; background: #fdf2f2; }
+        .modal-limpar .modal-box .opcao-limpar.selecionada { border-color: #e74c3c; background: #fdf2f2; box-shadow: 0 0 0 2px #e74c3c; }
 
         .modal-detalhes {
             display: none;
@@ -288,25 +227,16 @@
             justify-content: center;
             align-items: center;
         }
-        .modal-detalhes.show {
-            display: flex;
-        }
-        .modal-detalhes .modal-box {
-            max-width: 400px;
-        }
+        .modal-detalhes.show { display: flex; }
+        .modal-detalhes .modal-box { max-width: 400px; }
         .modal-detalhes .modal-box .detalhe-item {
             display: flex;
             justify-content: space-between;
             padding: 8px 0;
             border-bottom: 1px solid #ecf0f1;
         }
-        .modal-detalhes .modal-box .detalhe-item .label {
-            font-weight: 600;
-            color: #2c3e50;
-        }
-        .modal-detalhes .modal-box .detalhe-item .valor {
-            color: #34495e;
-        }
+        .modal-detalhes .modal-box .detalhe-item .label { font-weight: 600; color: #2c3e50; }
+        .modal-detalhes .modal-box .detalhe-item .valor { color: #34495e; }
         .modal-detalhes .modal-box .btn-fechar {
             background: #3498db;
             color: white;
@@ -320,9 +250,7 @@
             margin-top: 15px;
             transition: background 0.3s;
         }
-        .modal-detalhes .modal-box .btn-fechar:hover {
-            background: #2980b9;
-        }
+        .modal-detalhes .modal-box .btn-fechar:hover { background: #2980b9; }
 
         .event-header {
             text-align: center;
@@ -370,10 +298,7 @@
             margin-bottom: 5px;
             font-size: 0.9em;
         }
-        .login-form .form-group label .required {
-            color: #e74c3c;
-            margin-left: 3px;
-        }
+        .login-form .form-group label .required { color: #e74c3c; margin-left: 3px; }
         .login-form .form-group input {
             width: 100%;
             padding: 10px 12px;
@@ -382,14 +307,31 @@
             font-size: 14px;
             transition: border-color 0.3s;
         }
-        .login-form .form-group input:focus {
-            outline: none;
+        .login-form .form-group input:focus { outline: none; border-color: #3498db; }
+        .login-form .form-group input.error { border-color: #e74c3c; background: #fdf2f2; }
+
+        /* Campo telefone com máscara */
+        .login-form .form-group input.telefone-mask {
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            color: #2c3e50;
+            background: #fff;
             border-color: #3498db;
         }
-        .login-form .form-group input.error {
-            border-color: #e74c3c;
-            background: #fdf2f2;
+        .login-form .form-group input.telefone-mask:focus {
+            border-color: #2ecc71;
+            box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.2);
         }
+        .login-form .form-group input.telefone-mask.encontrado {
+            border-color: #2ecc71;
+            background: #f0faf0;
+        }
+        .login-form .form-group input.telefone-mask.nao-encontrado {
+            border-color: #e67e22;
+            background: #fef9e7;
+        }
+
         .login-form .btn-entrar {
             background: #27ae60;
             color: white;
@@ -411,6 +353,25 @@
             background: #95a5a6;
             cursor: not-allowed;
             opacity: 0.7;
+        }
+
+        .status-usuario {
+            padding: 12px 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+            font-weight: 500;
+            display: none;
+        }
+        .status-usuario.show { display: block; }
+        .status-usuario.novo {
+            background: #fef9e7;
+            color: #7d6608;
+            border-left: 4px solid #f39c12;
+        }
+        .status-usuario.existente {
+            background: #f0faf0;
+            color: #1e8449;
+            border-left: 4px solid #27ae60;
         }
 
         #mainContent { display: none; }
@@ -489,13 +450,8 @@
             transition: all 0.3s;
             display: none;
         }
-        .dia-title .btn-limpar-dia:hover {
-            background: #c0392b;
-            transform: scale(1.05);
-        }
-        .dia-title .btn-limpar-dia.visible {
-            display: inline-block;
-        }
+        .dia-title .btn-limpar-dia:hover { background: #c0392b; transform: scale(1.05); }
+        .dia-title .btn-limpar-dia.visible { display: inline-block; }
 
         .turnos-grid {
             display: grid;
@@ -772,20 +728,27 @@
         <!-- LOGIN SCREEN -->
         <div id="loginScreen">
             <div class="login-form">
-                <h3>📋 Preencha seus dados para começar</h3>
-                <div class="form-group">
-                    <label>NOME COMPLETO <span class="required">*</span></label>
-                    <input type="text" id="nomeInput" placeholder="Digite seu nome completo" maxlength="60">
-                </div>
+                <h3>📱 Identifique-se com seu telefone</h3>
+                
                 <div class="form-group">
                     <label>TELEFONE <span class="required">*</span></label>
-                    <input type="tel" id="telefoneInput" placeholder="(00) 00000-0000" maxlength="20">
+                    <input type="text" id="telefoneInput" class="telefone-mask" 
+                           placeholder="(86) 9.9850-2160" maxlength="16">
                 </div>
+
+                <div class="status-usuario" id="statusUsuario"></div>
+
+                <div class="form-group">
+                    <label>NOME COMPLETO <span class="required">*</span></label>
+                    <input type="text" id="nomeInput" placeholder="Digite seu nome completo" maxlength="60" disabled>
+                </div>
+
                 <div class="form-group">
                     <label>CONGREGAÇÃO <span class="required">*</span></label>
-                    <input type="text" id="congregacaoInput" placeholder="Nome da congregação" maxlength="50">
+                    <input type="text" id="congregacaoInput" placeholder="Nome da congregação" maxlength="50" disabled>
                 </div>
-                <button class="btn-entrar" id="btnEntrar">📋 ENTRAR</button>
+
+                <button class="btn-entrar" id="btnEntrar" disabled>📋 ENTRAR</button>
             </div>
         </div>
 
@@ -855,7 +818,13 @@
         // ============================================
         // ESTADO
         // ============================================
-        let usuarioAtual = null, vagasData = {}, meuUid = null, isProprietario = false, opcaoLimpezaSelecionada = 'todos';
+        let usuarioAtual = null;
+        let vagasData = {};
+        let meuUid = null;
+        let isProprietario = false;
+        let opcaoLimpezaSelecionada = 'todos';
+        let telefoneAtual = '';
+        let dadosUsuario = null;
 
         // ============================================
         // DOM ELEMENTS
@@ -900,6 +869,134 @@
         const detData = document.getElementById('detData');
         const detUid = document.getElementById('detUid');
         const btnFecharDetalhes = document.getElementById('btnFecharDetalhes');
+        const statusUsuario = document.getElementById('statusUsuario');
+
+        // ============================================
+        // MÁSCARA DE TELEFONE AO VIVO
+        // ============================================
+        function formatarTelefone(valor) {
+            // Remove tudo que não é número
+            valor = valor.replace(/\D/g, '');
+            
+            // Limita a 11 dígitos
+            if (valor.length > 11) valor = valor.slice(0, 11);
+            
+            // Aplica a máscara
+            if (valor.length <= 2) {
+                return valor;
+            } else if (valor.length <= 6) {
+                return '(' + valor.slice(0, 2) + ') ' + valor.slice(2);
+            } else if (valor.length <= 10) {
+                return '(' + valor.slice(0, 2) + ') ' + valor.slice(2, 3) + '.' + 
+                       valor.slice(3, 7) + '-' + valor.slice(7);
+            } else {
+                return '(' + valor.slice(0, 2) + ') ' + valor.slice(2, 3) + '.' + 
+                       valor.slice(3, 7) + '-' + valor.slice(7);
+            }
+        }
+
+        function limparMascara(valor) {
+            return valor.replace(/\D/g, '');
+        }
+
+        // ============================================
+        // BUSCAR USUÁRIO POR TELEFONE
+        // ============================================
+        function buscarUsuarioPorTelefone(telefone) {
+            const telefoneLimpo = limparMascara(telefone);
+            
+            // Só busca se tiver pelo menos 10 dígitos
+            if (telefoneLimpo.length < 10) {
+                nomeInput.disabled = true;
+                congregacaoInput.disabled = true;
+                btnEntrar.disabled = true;
+                statusUsuario.className = 'status-usuario';
+                statusUsuario.textContent = '';
+                telefoneInput.className = 'telefone-mask';
+                return;
+            }
+
+            const ref = database.ref('usuarios');
+            ref.orderByChild('telefone').equalTo(telefoneLimpo).once('value')
+                .then((snapshot) => {
+                    if (snapshot.exists()) {
+                        // Usuário encontrado
+                        const dados = snapshot.val();
+                        const chave = Object.keys(dados)[0];
+                        dadosUsuario = dados[chave];
+                        dadosUsuario.chave = chave;
+                        
+                        // Preenche os campos
+                        nomeInput.value = dadosUsuario.nome || '';
+                        congregacaoInput.value = dadosUsuario.congregacao || '';
+                        
+                        // Habilita os campos para edição
+                        nomeInput.disabled = false;
+                        congregacaoInput.disabled = false;
+                        btnEntrar.disabled = false;
+                        
+                        // Status visual
+                        statusUsuario.className = 'status-usuario show existente';
+                        statusUsuario.textContent = `✅ Bem-vindo de volta, ${dadosUsuario.nome || 'voluntário'}! Você pode editar seus dados se necessário.`;
+                        telefoneInput.className = 'telefone-mask encontrado';
+                        
+                        showMessage('✅ Usuário encontrado! Preencha ou edite os dados e clique em ENTRAR.', 'success');
+                    } else {
+                        // Novo usuário
+                        dadosUsuario = null;
+                        
+                        // Habilita os campos para preenchimento
+                        nomeInput.disabled = false;
+                        congregacaoInput.disabled = false;
+                        btnEntrar.disabled = false;
+                        
+                        // Limpa os campos
+                        nomeInput.value = '';
+                        congregacaoInput.value = '';
+                        
+                        // Status visual
+                        statusUsuario.className = 'status-usuario show novo';
+                        statusUsuario.textContent = '🆕 Novo usuário! Preencha seus dados para começar.';
+                        telefoneInput.className = 'telefone-mask nao-encontrado';
+                        
+                        showMessage('📝 Novo usuário! Preencha seus dados e clique em ENTRAR.', 'info');
+                    }
+                })
+                .catch((error) => {
+                    console.error('Erro ao buscar usuário:', error);
+                    showMessage('Erro ao buscar usuário: ' + error.message, 'error');
+                });
+        }
+
+        // ============================================
+        // EVENTO DE DIGITAÇÃO DO TELEFONE
+        // ============================================
+        telefoneInput.addEventListener('input', function(e) {
+            const cursorPos = this.selectionStart;
+            const valorAnterior = this.value;
+            
+            // Aplica a máscara
+            let valorDigitado = this.value;
+            const apenasNumeros = limparMascara(valorDigitado);
+            
+            // Se o usuário está apagando, não formata
+            if (valorDigitado.length < valorAnterior.length) {
+                // Remove caracteres não numéricos
+                this.value = apenasNumeros;
+                // Aplica a máscara básica
+                this.value = formatarTelefone(apenasNumeros);
+                telefoneAtual = this.value;
+                buscarUsuarioPorTelefone(this.value);
+                return;
+            }
+            
+            // Formata o telefone
+            this.value = formatarTelefone(apenasNumeros);
+            telefoneAtual = this.value;
+            
+            // Busca o usuário
+            buscarUsuarioPorTelefone(this.value);
+        });
 
         // ============================================
         // FUNÇÕES AUXILIARES
@@ -945,7 +1042,7 @@
         }
 
         // ============================================
-        // RENDERIZAR VAGAS COM onclick DIRETO
+        // RENDERIZAR VAGAS
         // ============================================
         function renderizarVagas() {
             let html = '';
@@ -973,7 +1070,7 @@
 
                         if (vaga) {
                             preenchidas++;
-                            const isMinha = usuarioAtual && vaga.uid === meuUid;
+                            const isMinha = usuarioAtual && vaga.telefone === usuarioAtual.telefone;
                             const isProp = usuarioAtual && usuarioAtual.isProprietario;
 
                             if (isProp) {
@@ -1008,7 +1105,6 @@
                             }
                         }
 
-                        // 🔥 CORREÇÃO: onclick DIRETO no HTML
                         html += `<div class="${classe}" ${onclickAttr} data-dia="${dia}" data-turno="${turnoIndex}" data-vaga="${v}">`;
                         if (htmlInterno) {
                             html += htmlInterno;
@@ -1026,17 +1122,15 @@
         }
 
         // ============================================
-        // OCUPAR VAGA (USUÁRIO COMUM)
+        // OCUPAR VAGA
         // ============================================
         function ocuparVaga(dia, turnoIndex, vagaIndex) {
-            console.log('ocuparVaga chamado!', dia, turnoIndex, vagaIndex);
-            
             if (isProprietario) {
                 showMessage('Administrador não pode ocupar vagas.', 'warning');
                 return;
             }
             if (!usuarioAtual) {
-                showMessage('Você precisa se identificar primeiro!', 'error');
+                showMessage('Identifique-se primeiro!', 'error');
                 return;
             }
             
@@ -1044,19 +1138,18 @@
             const ref = database.ref(`vagas/${path}`);
             ref.once('value', (snapshot) => {
                 if (snapshot.exists() && snapshot.val() !== null) {
-                    showMessage('Esta vaga já foi ocupada por outro voluntário!', 'error');
+                    showMessage('Esta vaga já foi ocupada!', 'error');
                     return;
                 }
                 const jaTemVaga = verificarVagaNoTurno(dia, turnoIndex);
                 if (jaTemVaga) {
-                    showMessage('Você já tem uma vaga neste turno! Libere a atual antes de ocupar outra.', 'warning');
+                    showMessage('Você já tem uma vaga neste turno!', 'warning');
                     return;
                 }
                 const dadosVaga = {
                     nome: usuarioAtual.nome,
                     telefone: usuarioAtual.telefone,
                     congregacao: usuarioAtual.congregacao,
-                    uid: meuUid,
                     data: new Date().toISOString()
                 };
                 ref.set(dadosVaga)
@@ -1069,8 +1162,6 @@
         // LIBERAR VAGA (USUÁRIO COMUM - PRÓPRIA VAGA)
         // ============================================
         function liberarVaga(dia, turnoIndex, vagaIndex) {
-            console.log('liberarVaga chamado!', dia, turnoIndex, vagaIndex);
-            
             if (isProprietario) {
                 showMessage('Administrador: use o botão 🗑️ para limpar.', 'warning');
                 return;
@@ -1081,7 +1172,7 @@
             const ref = database.ref(`vagas/${path}`);
             ref.once('value', (snapshot) => {
                 const vaga = snapshot.val();
-                if (!vaga || vaga.uid !== meuUid) {
+                if (!vaga || vaga.telefone !== usuarioAtual.telefone) {
                     showMessage('Esta vaga não é sua!', 'error');
                     return;
                 }
@@ -1095,13 +1186,13 @@
             const turnoData = vagasData[dia]?.[`turno${turnoIndex}`] || {};
             for (let v = 0; v < VAGAS_POR_TURNO; v++) {
                 const vaga = turnoData[`vaga${v}`] || null;
-                if (vaga && vaga.uid === meuUid) return true;
+                if (vaga && vaga.telefone === usuarioAtual.telefone) return true;
             }
             return false;
         }
 
         // ============================================
-        // ADMIN: LIBERAR VAGA (BOTÃO)
+        // ADMIN FUNÇÕES
         // ============================================
         function liberarVagaAdmin(dia, turnoIndex, vagaIndex) {
             if (!usuarioAtual || !usuarioAtual.isProprietario) {
@@ -1121,9 +1212,6 @@
             });
         }
 
-        // ============================================
-        // ADMIN: VER DETALHES (BOTÃO)
-        // ============================================
         function verDetalhesVaga(dia, turnoIndex, vagaIndex) {
             if (!usuarioAtual || !usuarioAtual.isProprietario) {
                 showMessage('Apenas o proprietário pode ver detalhes!', 'error');
@@ -1141,7 +1229,7 @@
         }
 
         // ============================================
-        // ADMIN: LIMPEZA EM MASSA
+        // LIMPEZA EM MASSA
         // ============================================
         function abrirModalLimpar(diaEspecifico = null) {
             if (!isProprietario) { showMessage('Apenas o proprietário pode limpar vagas!', 'error'); return; }
@@ -1227,7 +1315,7 @@
                         const vaga = turnoData[`vaga${v}`] || null;
                         if (vaga) {
                             preenchidas++;
-                            if (vaga.uid === meuUid) minhas++;
+                            if (usuarioAtual && vaga.telefone === usuarioAtual.telefone) minhas++;
                         }
                     }
                 });
@@ -1238,47 +1326,83 @@
         }
 
         // ============================================
-        // LOGIN / LOGOUT / UI
+        // SALVAR USUÁRIO NO FIREBASE
+        // ============================================
+        function salvarUsuario(telefone, nome, congregacao) {
+            const telefoneLimpo = limparMascara(telefone);
+            
+            // Se já existe usuário, atualiza
+            if (dadosUsuario && dadosUsuario.chave) {
+                return database.ref(`usuarios/${dadosUsuario.chave}`).update({
+                    nome: nome,
+                    congregacao: congregacao,
+                    ultimo_acesso: new Date().toISOString()
+                });
+            } else {
+                // Novo usuário
+                return database.ref('usuarios').push({
+                    nome: nome,
+                    telefone: telefoneLimpo,
+                    congregacao: congregacao,
+                    data_cadastro: new Date().toISOString(),
+                    ultimo_acesso: new Date().toISOString()
+                });
+            }
+        }
+
+        // ============================================
+        // LOGIN
         // ============================================
         function fazerLogin() {
-            const nome = nomeInput.value.trim(), telefone = telefoneInput.value.trim(), congregacao = congregacaoInput.value.trim();
-            let isValid = true;
-            if (!nome) { nomeInput.classList.add('error'); isValid = false; } else { nomeInput.classList.remove('error'); }
-            if (!telefone) { telefoneInput.classList.add('error'); isValid = false; } else { telefoneInput.classList.remove('error'); }
-            if (!congregacao) { congregacaoInput.classList.add('error'); isValid = false; } else { congregacaoInput.classList.remove('error'); }
-            if (!isValid) { showMessage('Preencha todos os campos!', 'error'); return; }
-            meuUid = gerarUid();
-            usuarioAtual = { nome, telefone, congregacao, uid: meuUid, isProprietario: false };
-            isProprietario = false;
-            loginScreen.classList.add('hidden');
-            mainContent.classList.add('show');
-            atualizarUI();
-            showMessage(`✅ Bem-vindo(a), ${nome}!`, 'success');
-            renderizarVagas();
+            const telefone = telefoneInput.value.trim();
+            const nome = nomeInput.value.trim();
+            const congregacao = congregacaoInput.value.trim();
+
+            if (!telefone || limparMascara(telefone).length < 10) {
+                showMessage('Digite um telefone válido com DDD!', 'error');
+                return;
+            }
+
+            if (!nome) {
+                showMessage('Digite seu nome completo!', 'error');
+                return;
+            }
+
+            if (!congregacao) {
+                showMessage('Digite sua congregação!', 'error');
+                return;
+            }
+
+            // Salvar/atualizar usuário no Firebase
+            salvarUsuario(telefone, nome, congregacao)
+                .then(() => {
+                    // Criar sessão do usuário
+                    meuUid = gerarUid();
+                    const telefoneLimpo = limparMascara(telefone);
+                    
+                    usuarioAtual = {
+                        nome: nome,
+                        telefone: telefoneLimpo,
+                        congregacao: congregacao,
+                        uid: meuUid,
+                        isProprietario: false
+                    };
+
+                    isProprietario = false;
+                    loginScreen.classList.add('hidden');
+                    mainContent.classList.add('show');
+                    atualizarUI();
+                    showMessage(`✅ Bem-vindo(a), ${nome}!`, 'success');
+                    renderizarVagas();
+                })
+                .catch((error) => {
+                    showMessage('Erro ao salvar usuário: ' + error.message, 'error');
+                });
         }
 
-        function fazerLogout() {
-            usuarioAtual = null;
-            meuUid = null;
-            isProprietario = false;
-            loginScreen.classList.remove('hidden');
-            mainContent.classList.remove('show');
-            proprietarioBadge.style.display = 'none';
-            legendaAdmin.style.display = 'none';
-            legendaAdminDetalhes.style.display = 'none';
-            legendaAdminLimpar.style.display = 'none';
-            statsProprietario.style.display = 'none';
-            cadeadoBtn.className = 'cadeado-btn';
-            cadeadoBtn.textContent = '🔒';
-            btnLimparGeral.classList.remove('visible');
-            userBadge.className = 'user-badge';
-            btnEntrar.disabled = false;
-            localStorage.removeItem('usuarioVoluntario');
-            localStorage.removeItem('meuUid');
-            localStorage.removeItem('isProprietario');
-            showMessage('👋 Você saiu.', 'info');
-        }
-
+        // ============================================
+        // LOGIN PROPRIETÁRIO
+        // ============================================
         function fazerLoginProprietario() {
             const email = emailProp.value.trim(), senha = senhaProp.value.trim();
             if (!senha) {
@@ -1289,7 +1413,14 @@
             }
             if (email === PROPRIETARIO_EMAIL && senha === PROPRIETARIO_SENHA) {
                 meuUid = 'proprietario_' + Date.now();
-                usuarioAtual = { nome: 'Nelson Picos', telefone: 'Administrador', congregacao: 'Proprietário', uid: meuUid, isProprietario: true, email: email };
+                usuarioAtual = { 
+                    nome: 'Nelson Picos', 
+                    telefone: 'Administrador', 
+                    congregacao: 'Proprietário', 
+                    uid: meuUid, 
+                    isProprietario: true, 
+                    email: email 
+                };
                 isProprietario = true;
                 fecharModal();
                 if (!loginScreen.classList.contains('hidden')) {
@@ -1306,6 +1437,45 @@
                 senhaProp.value = '';
                 senhaProp.focus();
             }
+        }
+
+        function fazerLogout() {
+            usuarioAtual = null;
+            meuUid = null;
+            isProprietario = false;
+            dadosUsuario = null;
+            
+            loginScreen.classList.remove('hidden');
+            mainContent.classList.remove('show');
+            
+            // Reset dos campos
+            telefoneInput.value = '';
+            nomeInput.value = '';
+            congregacaoInput.value = '';
+            nomeInput.disabled = true;
+            congregacaoInput.disabled = true;
+            btnEntrar.disabled = true;
+            statusUsuario.className = 'status-usuario';
+            statusUsuario.textContent = '';
+            telefoneInput.className = 'telefone-mask';
+            
+            proprietarioBadge.style.display = 'none';
+            legendaAdmin.style.display = 'none';
+            legendaAdminDetalhes.style.display = 'none';
+            legendaAdminLimpar.style.display = 'none';
+            statsProprietario.style.display = 'none';
+            cadeadoBtn.className = 'cadeado-btn';
+            cadeadoBtn.textContent = '🔒';
+            btnLimparGeral.classList.remove('visible');
+            userBadge.className = 'user-badge';
+            btnEntrar.disabled = false;
+            
+            localStorage.removeItem('usuarioVoluntario');
+            localStorage.removeItem('meuUid');
+            localStorage.removeItem('isProprietario');
+            localStorage.removeItem('telefoneUsuario');
+            
+            showMessage('👋 Você saiu.', 'info');
         }
 
         function atualizarUI() {
@@ -1339,6 +1509,7 @@
                 localStorage.setItem('usuarioVoluntario', JSON.stringify(usuarioAtual));
                 localStorage.setItem('meuUid', meuUid);
                 localStorage.setItem('isProprietario', JSON.stringify(isProp));
+                localStorage.setItem('telefoneUsuario', usuarioAtual.telefone);
             }
         }
 
@@ -1346,20 +1517,36 @@
             const saved = localStorage.getItem('usuarioVoluntario');
             const savedUid = localStorage.getItem('meuUid');
             const savedIsProp = localStorage.getItem('isProprietario');
-            if (saved && savedUid) {
+            const savedTelefone = localStorage.getItem('telefoneUsuario');
+            
+            if (saved && savedUid && savedTelefone) {
                 try {
                     const usuario = JSON.parse(saved);
                     usuarioAtual = usuario;
                     meuUid = savedUid;
                     isProprietario = savedIsProp === 'true';
-                    loginScreen.classList.add('hidden');
-                    mainContent.classList.add('show');
-                    atualizarUI();
-                    renderizarVagas();
+                    
+                    // Buscar dados atualizados do usuário
+                    const telefoneLimpo = limparMascara(savedTelefone);
+                    const ref = database.ref('usuarios');
+                    ref.orderByChild('telefone').equalTo(telefoneLimpo).once('value')
+                        .then((snapshot) => {
+                            if (snapshot.exists()) {
+                                const dados = snapshot.val();
+                                const chave = Object.keys(dados)[0];
+                                dadosUsuario = dados[chave];
+                                dadosUsuario.chave = chave;
+                            }
+                            loginScreen.classList.add('hidden');
+                            mainContent.classList.add('show');
+                            atualizarUI();
+                            renderizarVagas();
+                        });
                 } catch (e) {
                     localStorage.removeItem('usuarioVoluntario');
                     localStorage.removeItem('meuUid');
                     localStorage.removeItem('isProprietario');
+                    localStorage.removeItem('telefoneUsuario');
                 }
             } else {
                 loginScreen.classList.remove('hidden');
@@ -1389,8 +1576,52 @@
         }
 
         // ============================================
-        // EVENTOS (DELEGADOS PARA BOTÕES ADMIN)
+        // EVENTOS
         // ============================================
+        btnEntrar.addEventListener('click', fazerLogin);
+        btnSair.addEventListener('click', fazerLogout);
+        
+        // Enter key nos campos
+        nomeInput.addEventListener('keypress', function(e) { if (e.key === 'Enter') fazerLogin(); });
+        congregacaoInput.addEventListener('keypress', function(e) { if (e.key === 'Enter') fazerLogin(); });
+        telefoneInput.addEventListener('keypress', function(e) { if (e.key === 'Enter') fazerLogin(); });
+
+        // Toggle senha
+        toggleSenha.addEventListener('click', function() {
+            if (senhaProp.type === 'password') {
+                senhaProp.type = 'text';
+                toggleSenha.textContent = '🙈';
+                toggleSenha.style.opacity = '1';
+            } else {
+                senhaProp.type = 'password';
+                toggleSenha.textContent = '👁️';
+                toggleSenha.style.opacity = '0.6';
+            }
+        });
+
+        // Cadeado
+        cadeadoBtn.addEventListener('click', function() {
+            if (isProprietario) {
+                isProprietario = false;
+                usuarioAtual.isProprietario = false;
+                localStorage.setItem('isProprietario', 'false');
+                atualizarUI();
+                renderizarVagas();
+                showMessage('👑 Modo proprietário desativado', 'info');
+            } else {
+                abrirModal();
+            }
+        });
+
+        // Eventos dos modais
+        btnLimparGeral.addEventListener('click', function() { abrirModalLimpar(null); });
+        btnConfirmarLimpeza.addEventListener('click', confirmarLimpeza);
+        btnCancelarLimpeza.addEventListener('click', fecharModalLimpar);
+        btnLoginProp.addEventListener('click', fazerLoginProprietario);
+        btnCancelProp.addEventListener('click', fecharModal);
+        btnFecharDetalhes.addEventListener('click', function() { modalDetalhes.classList.remove('show'); });
+
+        // Eventos de clique para botões admin
         document.addEventListener('click', function(e) {
             const verBtn = e.target.closest('.btn-admin-ver');
             if (verBtn) {
@@ -1412,62 +1643,12 @@
             }
         });
 
-        btnFecharDetalhes.addEventListener('click', function() {
-            modalDetalhes.classList.remove('show');
-        });
-        modalDetalhes.addEventListener('click', function(e) {
-            if (e.target === modalDetalhes) modalDetalhes.classList.remove('show');
-        });
-
-        // ============================================
-        // EXPOR FUNÇÕES PARA O ONCLICK
-        // ============================================
-        window.ocuparVaga = ocuparVaga;
-        window.liberarVaga = liberarVaga;
-        window.liberarVagaAdmin = liberarVagaAdmin;
-        window.abrirModalLimpar = abrirModalLimpar;
-
-        // ============================================
-        // INICIALIZAÇÃO
-        // ============================================
-        btnEntrar.addEventListener('click', fazerLogin);
-        btnSair.addEventListener('click', fazerLogout);
-        toggleSenha.addEventListener('click', function() {
-            if (senhaProp.type === 'password') {
-                senhaProp.type = 'text';
-                toggleSenha.textContent = '🙈';
-                toggleSenha.style.opacity = '1';
-            } else {
-                senhaProp.type = 'password';
-                toggleSenha.textContent = '👁️';
-                toggleSenha.style.opacity = '0.6';
-            }
-        });
-        cadeadoBtn.addEventListener('click', function() {
-            if (isProprietario) {
-                isProprietario = false;
-                usuarioAtual.isProprietario = false;
-                localStorage.setItem('isProprietario', 'false');
-                atualizarUI();
-                renderizarVagas();
-                showMessage('👑 Modo proprietário desativado', 'info');
-            } else {
-                abrirModal();
-            }
-        });
-        btnLimparGeral.addEventListener('click', function() { abrirModalLimpar(null); });
-        btnConfirmarLimpeza.addEventListener('click', confirmarLimpeza);
-        btnCancelarLimpeza.addEventListener('click', fecharModalLimpar);
-        btnLoginProp.addEventListener('click', fazerLoginProprietario);
-        btnCancelProp.addEventListener('click', fecharModal);
-
-        senhaProp.addEventListener('keypress', function(e) { if (e.key === 'Enter') fazerLoginProprietario(); });
-        [nomeInput, telefoneInput, congregacaoInput].forEach(input => {
-            input.addEventListener('keypress', function(e) { if (e.key === 'Enter') fazerLogin(); });
-            input.addEventListener('input', function() { this.classList.remove('error'); });
-        });
+        // Fechar modais clicando fora
         modalOverlay.addEventListener('click', function(e) { if (e.target === modalOverlay) fecharModal(); });
         modalLimpar.addEventListener('click', function(e) { if (e.target === modalLimpar) fecharModalLimpar(); });
+        modalDetalhes.addEventListener('click', function(e) { if (e.target === modalDetalhes) modalDetalhes.classList.remove('show'); });
+
+        // Opções de limpeza
         opcoesLimpar.forEach(el => {
             el.addEventListener('click', function() {
                 if (this.style.opacity === '0.5') return;
@@ -1477,10 +1658,26 @@
             });
         });
 
+        // ============================================
+        // EXPOR FUNÇÕES
+        // ============================================
+        window.ocuparVaga = ocuparVaga;
+        window.liberarVaga = liberarVaga;
+        window.liberarVagaAdmin = liberarVagaAdmin;
+        window.abrirModalLimpar = abrirModalLimpar;
+
+        // ============================================
+        // INICIALIZAÇÃO
+        // ============================================
         function init() {
             verificarSessao();
             inicializarVagas();
             carregarVagas();
+            
+            // Se não estiver logado, foca no telefone
+            if (!usuarioAtual) {
+                telefoneInput.focus();
+            }
         }
         init();
     </script>
