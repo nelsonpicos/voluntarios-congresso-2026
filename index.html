@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Voluntários - Congresso 2026</title>
     
+    <!-- FORÇA O NAVEGADOR A NÃO USAR CACHE -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     
@@ -310,7 +315,6 @@
         .login-form .form-group input:focus { outline: none; border-color: #3498db; }
         .login-form .form-group input.error { border-color: #e74c3c; background: #fdf2f2; }
 
-        /* Campo telefone com máscara */
         .login-form .form-group input.telefone-mask {
             font-size: 18px;
             font-weight: 600;
@@ -823,7 +827,6 @@
         let meuUid = null;
         let isProprietario = false;
         let opcaoLimpezaSelecionada = 'todos';
-        let telefoneAtual = '';
         let dadosUsuario = null;
 
         // ============================================
@@ -875,13 +878,9 @@
         // MÁSCARA DE TELEFONE AO VIVO
         // ============================================
         function formatarTelefone(valor) {
-            // Remove tudo que não é número
             valor = valor.replace(/\D/g, '');
-            
-            // Limita a 11 dígitos
             if (valor.length > 11) valor = valor.slice(0, 11);
             
-            // Aplica a máscara
             if (valor.length <= 2) {
                 return valor;
             } else if (valor.length <= 6) {
@@ -905,7 +904,6 @@
         function buscarUsuarioPorTelefone(telefone) {
             const telefoneLimpo = limparMascara(telefone);
             
-            // Só busca se tiver pelo menos 10 dígitos
             if (telefoneLimpo.length < 10) {
                 nomeInput.disabled = true;
                 congregacaoInput.disabled = true;
@@ -920,41 +918,30 @@
             ref.orderByChild('telefone').equalTo(telefoneLimpo).once('value')
                 .then((snapshot) => {
                     if (snapshot.exists()) {
-                        // Usuário encontrado
                         const dados = snapshot.val();
                         const chave = Object.keys(dados)[0];
                         dadosUsuario = dados[chave];
                         dadosUsuario.chave = chave;
                         
-                        // Preenche os campos
                         nomeInput.value = dadosUsuario.nome || '';
                         congregacaoInput.value = dadosUsuario.congregacao || '';
-                        
-                        // Habilita os campos para edição
                         nomeInput.disabled = false;
                         congregacaoInput.disabled = false;
                         btnEntrar.disabled = false;
                         
-                        // Status visual
                         statusUsuario.className = 'status-usuario show existente';
                         statusUsuario.textContent = `✅ Bem-vindo de volta, ${dadosUsuario.nome || 'voluntário'}! Você pode editar seus dados se necessário.`;
                         telefoneInput.className = 'telefone-mask encontrado';
                         
                         showMessage('✅ Usuário encontrado! Preencha ou edite os dados e clique em ENTRAR.', 'success');
                     } else {
-                        // Novo usuário
                         dadosUsuario = null;
-                        
-                        // Habilita os campos para preenchimento
                         nomeInput.disabled = false;
                         congregacaoInput.disabled = false;
                         btnEntrar.disabled = false;
-                        
-                        // Limpa os campos
                         nomeInput.value = '';
                         congregacaoInput.value = '';
                         
-                        // Status visual
                         statusUsuario.className = 'status-usuario show novo';
                         statusUsuario.textContent = '🆕 Novo usuário! Preencha seus dados para começar.';
                         telefoneInput.className = 'telefone-mask nao-encontrado';
@@ -972,30 +959,29 @@
         // EVENTO DE DIGITAÇÃO DO TELEFONE
         // ============================================
         telefoneInput.addEventListener('input', function(e) {
-            const cursorPos = this.selectionStart;
-            const valorAnterior = this.value;
+            const valorAtual = this.value;
+            const apenasNumeros = limparMascara(valorAtual);
             
-            // Aplica a máscara
-            let valorDigitado = this.value;
-            const apenasNumeros = limparMascara(valorDigitado);
-            
-            // Se o usuário está apagando, não formata
-            if (valorDigitado.length < valorAnterior.length) {
-                // Remove caracteres não numéricos
-                this.value = apenasNumeros;
-                // Aplica a máscara básica
+            // Se o usuário está apagando, não força formatação
+            if (valorAtual.length < this.dataset.ultimoTamanho || apenasNumeros.length < 10) {
+                this.dataset.ultimoTamanho = valorAtual.length;
                 this.value = formatarTelefone(apenasNumeros);
                 telefoneAtual = this.value;
                 buscarUsuarioPorTelefone(this.value);
                 return;
             }
             
-            // Formata o telefone
             this.value = formatarTelefone(apenasNumeros);
+            this.dataset.ultimoTamanho = this.value.length;
             telefoneAtual = this.value;
-            
-            // Busca o usuário
             buscarUsuarioPorTelefone(this.value);
+        });
+
+        telefoneInput.addEventListener('keydown', function(e) {
+            // Se estiver apagando, não formata
+            if (e.key === 'Backspace' || e.key === 'Delete') {
+                this.dataset.deletando = 'true';
+            }
         });
 
         // ============================================
@@ -1074,7 +1060,6 @@
                             const isProp = usuarioAtual && usuarioAtual.isProprietario;
 
                             if (isProp) {
-                                // ADMIN: botões
                                 classe += ' vaga-admin';
                                 const nomeVoluntario = vaga.nome || 'Voluntário';
                                 htmlInterno = `
@@ -1093,7 +1078,6 @@
                                 displayText = `✅ ${vaga.nome}`;
                             }
                         } else {
-                            // VAGA DISPONÍVEL
                             classe += ' disponivel';
                             if (isProprietario) {
                                 displayText = `📋 Vaga ${v+1}`;
@@ -1331,7 +1315,6 @@
         function salvarUsuario(telefone, nome, congregacao) {
             const telefoneLimpo = limparMascara(telefone);
             
-            // Se já existe usuário, atualiza
             if (dadosUsuario && dadosUsuario.chave) {
                 return database.ref(`usuarios/${dadosUsuario.chave}`).update({
                     nome: nome,
@@ -1339,7 +1322,6 @@
                     ultimo_acesso: new Date().toISOString()
                 });
             } else {
-                // Novo usuário
                 return database.ref('usuarios').push({
                     nome: nome,
                     telefone: telefoneLimpo,
@@ -1373,10 +1355,8 @@
                 return;
             }
 
-            // Salvar/atualizar usuário no Firebase
             salvarUsuario(telefone, nome, congregacao)
                 .then(() => {
-                    // Criar sessão do usuário
                     meuUid = gerarUid();
                     const telefoneLimpo = limparMascara(telefone);
                     
@@ -1448,7 +1428,6 @@
             loginScreen.classList.remove('hidden');
             mainContent.classList.remove('show');
             
-            // Reset dos campos
             telefoneInput.value = '';
             nomeInput.value = '';
             congregacaoInput.value = '';
@@ -1526,7 +1505,6 @@
                     meuUid = savedUid;
                     isProprietario = savedIsProp === 'true';
                     
-                    // Buscar dados atualizados do usuário
                     const telefoneLimpo = limparMascara(savedTelefone);
                     const ref = database.ref('usuarios');
                     ref.orderByChild('telefone').equalTo(telefoneLimpo).once('value')
@@ -1551,6 +1529,7 @@
             } else {
                 loginScreen.classList.remove('hidden');
                 mainContent.classList.remove('show');
+                telefoneInput.focus();
             }
         }
 
@@ -1581,12 +1560,10 @@
         btnEntrar.addEventListener('click', fazerLogin);
         btnSair.addEventListener('click', fazerLogout);
         
-        // Enter key nos campos
         nomeInput.addEventListener('keypress', function(e) { if (e.key === 'Enter') fazerLogin(); });
         congregacaoInput.addEventListener('keypress', function(e) { if (e.key === 'Enter') fazerLogin(); });
         telefoneInput.addEventListener('keypress', function(e) { if (e.key === 'Enter') fazerLogin(); });
 
-        // Toggle senha
         toggleSenha.addEventListener('click', function() {
             if (senhaProp.type === 'password') {
                 senhaProp.type = 'text';
@@ -1599,7 +1576,6 @@
             }
         });
 
-        // Cadeado
         cadeadoBtn.addEventListener('click', function() {
             if (isProprietario) {
                 isProprietario = false;
@@ -1613,7 +1589,6 @@
             }
         });
 
-        // Eventos dos modais
         btnLimparGeral.addEventListener('click', function() { abrirModalLimpar(null); });
         btnConfirmarLimpeza.addEventListener('click', confirmarLimpeza);
         btnCancelarLimpeza.addEventListener('click', fecharModalLimpar);
@@ -1621,7 +1596,6 @@
         btnCancelProp.addEventListener('click', fecharModal);
         btnFecharDetalhes.addEventListener('click', function() { modalDetalhes.classList.remove('show'); });
 
-        // Eventos de clique para botões admin
         document.addEventListener('click', function(e) {
             const verBtn = e.target.closest('.btn-admin-ver');
             if (verBtn) {
@@ -1643,12 +1617,10 @@
             }
         });
 
-        // Fechar modais clicando fora
         modalOverlay.addEventListener('click', function(e) { if (e.target === modalOverlay) fecharModal(); });
         modalLimpar.addEventListener('click', function(e) { if (e.target === modalLimpar) fecharModalLimpar(); });
         modalDetalhes.addEventListener('click', function(e) { if (e.target === modalDetalhes) modalDetalhes.classList.remove('show'); });
 
-        // Opções de limpeza
         opcoesLimpar.forEach(el => {
             el.addEventListener('click', function() {
                 if (this.style.opacity === '0.5') return;
@@ -1674,7 +1646,6 @@
             inicializarVagas();
             carregarVagas();
             
-            // Se não estiver logado, foca no telefone
             if (!usuarioAtual) {
                 telefoneInput.focus();
             }
