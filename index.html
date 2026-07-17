@@ -875,19 +875,28 @@
         const statusUsuario = document.getElementById('statusUsuario');
 
         // ============================================
-        // MÁSCARA DE TELEFONE AO VIVO
+        // MÁSCARA DE TELEFONE AO VIVO (CORRIGIDA)
         // ============================================
         function formatarTelefone(valor) {
+            // Remove tudo que não é número
             valor = valor.replace(/\D/g, '');
+            
+            // Limita a 11 dígitos
             if (valor.length > 11) valor = valor.slice(0, 11);
             
+            // Se tem menos de 2 dígitos, retorna só os números
             if (valor.length <= 2) {
                 return valor;
-            } else if (valor.length <= 6) {
+            }
+            
+            // Se tem menos de 10 dígitos, mostra só o DDD
+            if (valor.length < 10) {
                 return '(' + valor.slice(0, 2) + ') ' + valor.slice(2);
-            } else if (valor.length <= 10) {
-                return '(' + valor.slice(0, 2) + ') ' + valor.slice(2, 3) + '.' + 
-                       valor.slice(3, 7) + '-' + valor.slice(7);
+            }
+            
+            // Aplica a máscara completa (COM ESPAÇO após o DDD)
+            if (valor.length <= 6) {
+                return '(' + valor.slice(0, 2) + ') ' + valor.slice(2);
             } else {
                 return '(' + valor.slice(0, 2) + ') ' + valor.slice(2, 3) + '.' + 
                        valor.slice(3, 7) + '-' + valor.slice(7);
