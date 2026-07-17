@@ -10,6 +10,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     
     <style>
+        /* ===== TODOS OS ESTILOS (MANTIDOS) ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -60,7 +61,6 @@
             background: #fef9e7;
         }
         
-        /* Botão Limpar Vagas (só proprietário) */
         .btn-limpar {
             display: none;
             background: #e74c3c;
@@ -81,7 +81,6 @@
             display: inline-block;
         }
         
-        /* MODAL DO PROPRIETÁRIO */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -182,7 +181,6 @@
             border-left: 3px solid #27ae60;
         }
 
-        /* MODAL DE LIMPEZA DE VAGAS */
         .modal-limpar {
             display: none;
             position: fixed;
@@ -278,7 +276,6 @@
             font-weight: 600;
         }
 
-        /* ===== TELA DE LOGIN ===== */
         #loginScreen { display: block; }
         #loginScreen.hidden { display: none; }
 
@@ -348,7 +345,6 @@
             opacity: 0.7;
         }
 
-        /* ===== CONTEÚDO PRINCIPAL ===== */
         #mainContent { display: none; }
         #mainContent.show { display: block; }
 
@@ -479,7 +475,21 @@
             border-color: #3498db;
             transform: scale(1.02);
         }
-        .vaga-item.preenchida { background: #d5f5e3; border-color: #27ae60; cursor: default; font-weight: 500; }
+        .vaga-item.preenchida { 
+            background: #d5f5e3; 
+            border-color: #27ae60; 
+            cursor: default; 
+            font-weight: 500; 
+        }
+        /* Quando proprietário, vaga preenchida fica clicável */
+        .vaga-item.preenchida.proprietario-pode-liberar {
+            cursor: pointer;
+        }
+        .vaga-item.preenchida.proprietario-pode-liberar:hover {
+            background: #fdebd0;
+            border-color: #e67e22;
+            transform: scale(1.02);
+        }
         .vaga-item.preenchida-por-mim {
             background: #fdebd0;
             border-color: #e67e22;
@@ -689,6 +699,9 @@
                 <div class="legenda-item" id="legendaProprietario" style="display: none;">
                     <span style="color: #8e44ad;">👑 Passe o mouse sobre vagas preenchidas para ver detalhes</span>
                 </div>
+                <div class="legenda-item" id="legendaProprietarioLiberar" style="display: none;">
+                    <span style="color: #e74c3c;">👑 Clique em qualquer vaga preenchida para liberar</span>
+                </div>
             </div>
 
             <div class="vagas-stats" id="statsArea">
@@ -723,12 +736,11 @@
             appId: "1:23899062695:web:0e30295ca792246259b682"
         };
 
-        // Inicializar Firebase (SOMENTE DATABASE, SEM AUTH!)
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
         // ============================================
-        // CONFIGURAÇÃO DO PROPRIETÁRIO (VALIDAÇÃO LOCAL)
+        // CONFIGURAÇÃO DO PROPRIETÁRIO
         // ============================================
         const PROPRIETARIO_EMAIL = 'nelson.picos@hotmail.com';
         const PROPRIETARIO_SENHA = 'Congresso$2026';
@@ -763,7 +775,6 @@
         // ============================================
         const loginScreen = document.getElementById('loginScreen');
         const mainContent = document.getElementById('mainContent');
-        
         const nomeInput = document.getElementById('nomeInput');
         const telefoneInput = document.getElementById('telefoneInput');
         const congregacaoInput = document.getElementById('congregacaoInput');
@@ -777,6 +788,7 @@
         const minhasVagasEl = document.getElementById('minhasVagas');
         const proprietarioBadge = document.getElementById('proprietarioBadge');
         const legendaProprietario = document.getElementById('legendaProprietario');
+        const legendaProprietarioLiberar = document.getElementById('legendaProprietarioLiberar');
         const statsProprietario = document.getElementById('statsProprietario');
         const vagasContent = document.getElementById('vagasContent');
         const btnLimparGeral = document.getElementById('btnLimparGeral');
@@ -785,8 +797,6 @@
         const btnCancelarLimpeza = document.getElementById('btnCancelarLimpeza');
         const mensagemLimpeza = document.getElementById('mensagemLimpeza');
         const opcoesLimpar = document.querySelectorAll('.opcao-limpar');
-        
-        // Modal
         const modalOverlay = document.getElementById('modalProprietario');
         const emailProp = document.getElementById('emailProp');
         const senhaProp = document.getElementById('senhaProp');
@@ -842,6 +852,9 @@
             });
         }
 
+        // ============================================
+        // RENDERIZAR VAGAS (COM LIBERAÇÃO PARA ADM)
+        // ============================================
         function renderizarVagas() {
             let html = '';
             let total = 0;
@@ -877,17 +890,24 @@
                         if (vaga) {
                             preenchidas++;
                             const isMinha = usuarioAtual && vaga.uid === meuUid;
+                            const isProp = usuarioAtual && usuarioAtual.isProprietario;
                             
                             if (isMinha) {
                                 classe += ' preenchida-por-mim';
                                 displayText = `👤 ${vaga.nome}`;
                                 minhas++;
                                 onClick = `onclick="liberarVaga('${dia}', ${turnoIndex}, ${v})"`;
+                            } else if (isProp) {
+                                // ⭐ PROPRIETÁRIO PODE LIBERAR QUALQUER VAGA
+                                classe += ' preenchida proprietario-pode-liberar';
+                                displayText = `✅ ${vaga.nome}`;
+                                onClick = `onclick="liberarVagaAdmin('${dia}', ${turnoIndex}, ${v})"`;
                             } else {
                                 classe += ' preenchida';
                                 displayText = `✅ ${vaga.nome}`;
                             }
 
+                            // Tooltip para proprietário
                             if (isProprietario) {
                                 tooltipHtml = `
                                     <div class="tooltip">
@@ -957,7 +977,7 @@
         }
 
         // ============================================
-        // OCUPAR / LIBERAR VAGA
+        // OCUPAR VAGA
         // ============================================
         function ocuparVaga(dia, turnoIndex, vagaIndex) {
             if (!usuarioAtual) {
@@ -998,6 +1018,9 @@
             });
         }
 
+        // ============================================
+        // LIBERAR VAGA (VOLUNTÁRIO LIBERA A PRÓPRIA)
+        // ============================================
         function liberarVaga(dia, turnoIndex, vagaIndex) {
             if (!usuarioAtual) return;
 
@@ -1021,6 +1044,41 @@
             });
         }
 
+        // ============================================
+        // ⭐ LIBERAR VAGA PELO ADMINISTRADOR (NOVA FUNÇÃO)
+        // ============================================
+        function liberarVagaAdmin(dia, turnoIndex, vagaIndex) {
+            if (!usuarioAtual || !usuarioAtual.isProprietario) {
+                showMessage('Apenas o proprietário pode fazer isso!', 'error');
+                return;
+            }
+
+            const path = getVagaKey(dia, turnoIndex, vagaIndex);
+            const ref = database.ref(`vagas/${path}`);
+
+            ref.once('value', (snapshot) => {
+                const vaga = snapshot.val();
+                if (!vaga) {
+                    showMessage('Esta vaga já está vazia!', 'error');
+                    return;
+                }
+
+                const nomeVoluntario = vaga.nome || 'Voluntário';
+                
+                if (!confirm(`⚠️ Deseja remover ${nomeVoluntario} desta vaga?`)) {
+                    return;
+                }
+
+                ref.set(null)
+                    .then(() => {
+                        showMessage(`🗑️ Vaga de ${nomeVoluntario} foi liberada!`, 'success');
+                    })
+                    .catch((error) => {
+                        showMessage('Erro ao liberar vaga: ' + error.message, 'error');
+                    });
+            });
+        }
+
         function verificarVagaNoTurno(dia, turnoIndex) {
             const turnoData = vagasData[dia]?.[`turno${turnoIndex}`] || {};
             for (let v = 0; v < VAGAS_POR_TURNO; v++) {
@@ -1033,7 +1091,7 @@
         }
 
         // ============================================
-        // FUNÇÕES DE LIMPEZA DE VAGAS
+        // FUNÇÕES DE LIMPEZA
         // ============================================
         function abrirModalLimpar(diaEspecifico = null) {
             if (!isProprietario) {
@@ -1143,7 +1201,7 @@
         }
 
         // ============================================
-        // LOGIN DO USUÁRIO
+        // LOGIN
         // ============================================
         function fazerLogin() {
             const nome = nomeInput.value.trim();
@@ -1186,7 +1244,7 @@
         }
 
         // ============================================
-        // LOGIN DO PROPRIETÁRIO (VALIDAÇÃO LOCAL)
+        // LOGIN PROPRIETÁRIO (VALIDAÇÃO LOCAL)
         // ============================================
         function abrirModal() {
             modalOverlay.classList.add('show');
@@ -1215,9 +1273,7 @@
                 return;
             }
 
-            // 🔐 VALIDAÇÃO DIRETA NO APP (SEM FIREBASE AUTH!)
             if (email === PROPRIETARIO_EMAIL && senha === PROPRIETARIO_SENHA) {
-                // Login bem-sucedido!
                 meuUid = 'proprietario_' + Date.now();
                 
                 usuarioAtual = {
@@ -1241,7 +1297,6 @@
                 showMessage('👑 Modo Proprietário ativado!', 'success');
                 renderizarVagas();
             } else {
-                // Login falhou
                 mensagemModal.className = 'mensagem-modal erro';
                 mensagemModal.textContent = '⚠️ E-mail ou senha incorretos!';
                 senhaProp.classList.add('error');
@@ -1266,6 +1321,7 @@
                     userBadge.className = 'user-badge proprietario';
                     proprietarioBadge.style.display = 'block';
                     legendaProprietario.style.display = 'block';
+                    legendaProprietarioLiberar.style.display = 'block';
                     statsProprietario.style.display = 'inline';
                     cadeadoBtn.className = 'cadeado-btn proprietario';
                     cadeadoBtn.textContent = '🔓';
@@ -1276,6 +1332,7 @@
                     userBadge.className = 'user-badge';
                     proprietarioBadge.style.display = 'none';
                     legendaProprietario.style.display = 'none';
+                    legendaProprietarioLiberar.style.display = 'none';
                     statsProprietario.style.display = 'none';
                     cadeadoBtn.className = 'cadeado-btn';
                     cadeadoBtn.textContent = '🔒';
@@ -1304,6 +1361,7 @@
             
             proprietarioBadge.style.display = 'none';
             legendaProprietario.style.display = 'none';
+            legendaProprietarioLiberar.style.display = 'none';
             statsProprietario.style.display = 'none';
             cadeadoBtn.className = 'cadeado-btn';
             cadeadoBtn.textContent = '🔒';
@@ -1319,7 +1377,7 @@
         }
 
         // ============================================
-        // VERIFICAR SESSÃO SALVA
+        // VERIFICAR SESSÃO
         // ============================================
         function verificarSessao() {
             const saved = localStorage.getItem('usuarioVoluntario');
@@ -1354,6 +1412,7 @@
         // ============================================
         window.ocuparVaga = ocuparVaga;
         window.liberarVaga = liberarVaga;
+        window.liberarVagaAdmin = liberarVagaAdmin;
         window.abrirModalLimpar = abrirModalLimpar;
 
         // ============================================
@@ -1424,7 +1483,7 @@
         });
 
         // ============================================
-        // INICIALIZAR APP
+        // INICIALIZAR
         // ============================================
         function init() {
             verificarSessao();
