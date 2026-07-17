@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voluntários - Congresso 2026</title>
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 30px;
+            position: relative;
+            width: 100%;
+        }
+        
+        /* CADEADO DO PROPRIETÁRIO */
+        .cadeado-container {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            z-index: 1000;
+        }
+        .cadeado-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: all 0.3s;
+            color: #95a5a6;
+        }
+        .cadeado-btn:hover {
+            background: #ecf0f1;
+            color: #2c3e50;
+        }
+        .cadeado-btn.proprietario {
+            color: #e67e22;
+            background: #fef9e7;
+        }
+        
+        /* MODAL DO PROPRIETÁRIO */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-overlay.show {
+            display: flex;
+        }
+        .modal-box {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        .modal-box h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+        .modal-box p {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+        }
+        .modal-box input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #bdc3c7;
+            border-radius: 6px;
+            font-size: 14px;
+            margin-bottom: 10px;
+            transition: border-color 0.3s;
+        }
+        .modal-box input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        .modal-box input.error {
+            border-color: #e74c3c;
+            background: #fdf2f2;
+        }
+        .modal-box .btn-login-prop {
+            background: #e67e22;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.3s;
+        }
+        .modal-box .btn-login-prop:hover {
+            background: #d35400;
+        }
+        .modal-box .btn-cancel {
+            background: #95a5a6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 8px;
+            transition: background 0.3s;
+        }
+        .modal-box .btn-cancel:hover {
+            background: #7f8c8d;
+        }
+        .modal-box .mensagem-modal {
+            padding: 8px 12px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+            display: none;
+        }
+        .modal-box .mensagem-modal.erro {
+            display: block;
+            background: #fdf2f2;
+            color: #c0392b;
+            border-left: 3px solid #e74c3c;
+        }
+        .modal-box .mensagem-modal.sucesso {
+            display: block;
+            background: #f0faf0;
+            color: #1e8449;
+            border-left: 3px solid #27ae60;
+        }
+
+        .event-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #2c3e50;
+        }
+        .event-header h1 { font-size: 2.2em; color: #2c3e50; margin-bottom: 5px; }
+        .event-header h2 { font-size: 1.5em; color: #34495e; font-weight: 300; }
+        .event-header .year { color: #e67e22; font-weight: bold; }
+        .event-header .proprietario-badge {
+            display: inline-block;
+            background: #e67e22;
+            color: white;
+            padding: 4px 15px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            margin-top: 8px;
+            font-weight: 600;
+        }
+
+        /* ===== TELA DE LOGIN (ÚNICA VISÍVEL NO INÍCIO) ===== */
+        #loginScreen {
+            display: block;
+        }
+        #loginScreen.hidden {
+            display: none;
+        }
+
+        .login-form {
+            background: #ecf0f1;
+            padding: 30px;
+            border-radius: 8px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .login-form h3 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+        }
+        .login-form .form-group {
+            margin-bottom: 15px;
+        }
+        .login-form .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+        .login-form .form-group label .required {
+            color: #e74c3c;
+            margin-left: 3px;
+        }
+        .login-form .form-group input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #bdc3c7;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        .login-form .form-group input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        .login-form .form-group input.error {
+            border-color: #e74c3c;
+            background: #fdf2f2;
+        }
+        .login-form .btn-entrar {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+        }
+        .login-form .btn-entrar:hover {
+            background: #229954;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(39,174,96,0.3);
+        }
+        .login-form .btn-entrar:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        /* ===== CONTEÚDO PRINCIPAL (SÓ APARECE DEPOIS DO LOGIN) ===== */
+        #mainContent {
+            display: none;
+        }
+        #mainContent.show {
+            display: block;
+        }
+
+        .btn-sair {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            height: 38px;
+            margin-left: 10px;
+        }
+        .btn-sair:hover { background: #c0392b; }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            padding: 10px 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        .user-badge {
+            background: #2c3e50;
+            color: white;
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+        .user-badge.proprietario { background: #e67e22; }
+
+        .message {
+            padding: 12px 18px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            display: none;
+        }
+        .message.show { display: block; }
+        .message.error { background: #fdf2f2; border-left: 4px solid #e74c3c; color: #c0392b; }
+        .message.success { background: #f0faf0; border-left: 4px solid #27ae60; color: #1e8449; }
+        .message.info { background: #eaf2f8; border-left: 4px solid #3498db; color: #1a5276; }
+        .message.warning { background: #fef9e7; border-left: 4px solid #f39c12; color: #7d6608; }
+
+        .vagas-container { margin-top: 20px; }
+        .dia-section { margin-bottom: 40px; }
+        .dia-title {
+            background: #2c3e50;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px 8px 0 0;
+            font-size: 1.3em;
+            font-weight: 600;
+        }
+        .turnos-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2px;
+            background: #bdc3c7;
+            border-radius: 0 0 8px 8px;
+            overflow: hidden;
+        }
+        .turno-card { background: white; padding: 10px; min-height: 200px; }
+        .turno-header {
+            background: #34495e;
+            color: white;
+            padding: 8px 10px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            font-size: 0.75em;
+            font-weight: 600;
+            text-align: center;
+            line-height: 1.3;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .vaga-item {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 4px;
+            padding: 6px 8px;
+            margin-bottom: 4px;
+            font-size: 0.85em;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            word-break: break-word;
+            position: relative;
+        }
+        .vaga-item:hover:not(.preenchida):not(.preenchida-por-mim) {
+            background: #e3f2fd;
+            border-color: #3498db;
+            transform: scale(1.02);
+        }
+        .vaga-item.preenchida { background: #d5f5e3; border-color: #27ae60; cursor: default; font-weight: 500; }
+        .vaga-item.preenchida-por-mim {
+            background: #fdebd0;
+            border-color: #e67e22;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .vaga-item.preenchida-por-mim:hover { background: #fad7a0; transform: scale(1.02); }
+        .vaga-item.preenchida .tooltip,
+        .vaga-item.preenchida-por-mim .tooltip {
+            visibility: hidden;
+            width: 250px;
+            background: #2c3e50;
+            color: #fff;
+            text-align: left;
+            border-radius: 6px;
+            padding: 10px 12px;
+            position: absolute;
+            z-index: 100;
+            bottom: 110%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.85em;
+            font-weight: 400;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            pointer-events: none;
+        }
+        .vaga-item.preenchida .tooltip::after,
+        .vaga-item.preenchida-por-mim .tooltip::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-top-color: #2c3e50;
+        }
+        .vaga-item.preenchida:hover .tooltip,
+        .vaga-item.preenchida-por-mim:hover .tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+        .vaga-item.disponivel { background: #f8f9fa; border-color: #dee2e6; color: #6c757d; }
+        .loading { text-align: center; padding: 40px; color: #7f8c8d; }
+        .loading .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @media (max-width: 1024px) { .turnos-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 600px) {
+            .turnos-grid { grid-template-columns: 1fr; }
+            .container { padding: 15px; }
+            .event-header h1 { font-size: 1.5em; }
+            .vaga-item.preenchida .tooltip,
+            .vaga-item.preenchida-por-mim .tooltip {
+                width: 200px;
+                font-size: 0.75em;
+                left: 0;
+                transform: none;
+            }
+            .cadeado-container {
+                position: relative;
+                text-align: right;
+                margin-bottom: 10px;
+            }
+            .login-form { padding: 20px; }
+        }
+        .legenda {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin: 15px 0;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            font-size: 0.85em;
+        }
+        .legenda-item { display: flex; align-items: center; gap: 6px; }
+        .legenda-cor { width: 20px; height: 20px; border-radius: 4px; border: 1px solid #dee2e6; }
+        .legenda-cor.disponivel { background: #f8f9fa; }
+        .legenda-cor.preenchida { background: #d5f5e3; }
+        .legenda-cor.minha { background: #fdebd0; }
+        .vagas-stats {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            background: #eaf2f8;
+            border-radius: 6px;
+            font-size: 0.9em;
+        }
+        .vagas-stats span { font-weight: 600; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- CADEADO DO PROPRIETÁRIO -->
+        <div class="cadeado-container">
+            <button class="cadeado-btn" id="cadeadoBtn" title="Área do Proprietário">🔒</button>
+        </div>
+
+        <!-- MODAL DO PROPRIETÁRIO -->
+        <div class="modal-overlay" id="modalProprietario">
+            <div class="modal-box">
+                <h3>🔐 Área do Proprietário</h3>
+                <p>Digite suas credenciais para acessar o modo proprietário</p>
+                <div class="mensagem-modal" id="mensagemModal"></div>
+                <input type="email" id="emailProp" placeholder="E-mail do proprietário" value="nelson.picos@hotmail.com" readonly style="background: #f8f9fa; color: #2c3e50;">
+                <input type="password" id="senhaProp" placeholder="Digite sua senha">
+                <button class="btn-login-prop" id="btnLoginProp">🔐 Entrar</button>
+                <button class="btn-cancel" id="btnCancelProp">Cancelar</button>
+            </div>
+        </div>
+
+        <div class="event-header">
+            <h1>🌿 CONGRESSO 2026</h1>
+            <h2>"<span style="color: #e67e22;">FELICIDADE ETERNA</span>"</h2>
+            <p style="color: #7f8c8d; margin-top: 5px; font-size: 0.95em;">
+                📍 Preenchimento de Vagas para Voluntários
+            </p>
+            <div id="proprietarioBadge" style="display: none;">
+                <span class="proprietario-badge">👑 PROPRIETÁRIO</span>
+            </div>
+        </div>
+
+        <div id="message" class="message"></div>
+
+        <!-- ===== TELA DE LOGIN ===== -->
+        <div id="loginScreen">
+            <div class="login-form">
+                <h3>📋 Preencha seus dados para começar</h3>
+                <div class="form-group">
+                    <label>NOME COMPLETO <span class="required">*</span></label>
+                    <input type="text" id="nomeInput" placeholder="Digite seu nome completo" maxlength="60">
+                </div>
+                <div class="form-group">
+                    <label>TELEFONE <span class="required">*</span></label>
+                    <input type="tel" id="telefoneInput" placeholder="(00) 00000-0000" maxlength="20">
+                </div>
+                <div class="form-group">
+                    <label>CONGREGAÇÃO <span class="required">*</span></label>
+                    <input type="text" id="congregacaoInput" placeholder="Nome da congregação" maxlength="50">
+                </div>
+                <button class="btn-entrar" id="btnEntrar">📋 ENTRAR</button>
+            </div>
+        </div>
+
+        <!-- ===== CONTEÚDO PRINCIPAL (SÓ APARECE DEPOIS DO LOGIN) ===== -->
+        <div id="mainContent">
+            <div class="user-info">
+                <span class="user-badge" id="userBadge">👤 </span>
+                <span id="userTipo" style="font-size: 0.85em; color: #7f8c8d;"></span>
+                <button class="btn-sair" id="btnSair">✕ Sair</button>
+            </div>
+
+            <div class="legenda">
+                <div class="legenda-item">
+                    <div class="legenda-cor disponivel"></div>
+                    <span>Vaga disponível</span>
+                </div>
+                <div class="legenda-item">
+                    <div class="legenda-cor preenchida"></div>
+                    <span>Preenchida por outro</span>
+                </div>
+                <div class="legenda-item">
+                    <div class="legenda-cor minha"></div>
+                    <span>Minha vaga</span>
+                </div>
+                <div class="legenda-item">
+                    <span style="color: #e67e22;">🖱️ Clique na vaga disponível para ocupar</span>
+                </div>
+                <div class="legenda-item">
+                    <span style="color: #e74c3c;">🖱️ Clique na sua vaga para liberar</span>
+                </div>
+                <div class="legenda-item" id="legendaProprietario" style="display: none;">
+                    <span style="color: #8e44ad;">👑 Passe o mouse sobre vagas preenchidas para ver detalhes</span>
+                </div>
+            </div>
+
+            <div class="vagas-stats" id="statsArea">
+                <span>📊 Total de vagas: <span id="totalVagas">0</span></span>
+                <span>✅ Preenchidas: <span id="vagasPreenchidas">0</span></span>
+                <span>📌 Suas vagas: <span id="minhasVagas">0</span></span>
+                <span id="statsProprietario" style="display: none;">👑 Modo proprietário ativo</span>
+            </div>
+
+            <div id="vagasContainer" class="vagas-container">
+                <div id="vagasContent">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>Carregando vagas...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // SUAS CREDENCIAIS DO FIREBASE
+        // ============================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyCtkA3nwtn7l4XaNicTbceoIWqMR00_rbw",
+            authDomain: "congresso-2026-voluntarios.firebaseapp.com",
+            databaseURL: "https://congresso-2026-voluntarios-default-rtdb.firebaseio.com",
+            projectId: "congresso-2026-voluntarios",
+            storageBucket: "congresso-2026-voluntarios.firebasestorage.app",
+            messagingSenderId: "23899062695",
+            appId: "1:23899062695:web:0e30295ca792246259b682"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const auth = firebase.auth();
+
+        // ============================================
+        // CONFIGURAÇÃO
+        // ============================================
+        const PROPRIETARIO_EMAIL = 'nelson.picos@hotmail.com';
+        const PROPRIETARIO_SENHA = 'Congresso$2026';
+        
+        const DIAS = ['sexta', 'sabado', 'domingo'];
+        const DIAS_LABEL = {
+            sexta: 'SEXTA-FEIRA',
+            sabado: 'SÁBADO',
+            domingo: 'DOMINGO'
+        };
+
+        const TURNOS = [
+            'TURNO 1 - De 08:30 até o início da seção manhã',
+            'TURNO 2 - Cântico final da Manhã até a metade do intervalo',
+            'TURNO 3 - Metade do intervalo até o cântico inicial da tarde',
+            'TURNO 4 - Cântico final da seção da tarde até a maioria das pessoas tenham saído'
+        ];
+
+        const VAGAS_POR_TURNO = 4;
+
+        // ============================================
+        // ESTADO DO APP
+        // ============================================
+        let usuarioAtual = null;
+        let vagasData = {};
+        let meuUid = null;
+        let isProprietario = false;
+
+        // ============================================
+        // ELEMENTOS DOM
+        // ============================================
+        const loginScreen = document.getElementById('loginScreen');
+        const mainContent = document.getElementById('mainContent');
+        
+        const nomeInput = document.getElementById('nomeInput');
+        const telefoneInput = document.getElementById('telefoneInput');
+        const congregacaoInput = document.getElementById('congregacaoInput');
+        const btnEntrar = document.getElementById('btnEntrar');
+        const btnSair = document.getElementById('btnSair');
+        const userBadge = document.getElementById('userBadge');
+        const userTipo = document.getElementById('userTipo');
+        const messageEl = document.getElementById('message');
+        const totalVagasEl = document.getElementById('totalVagas');
+        const vagasPreenchidasEl = document.getElementById('vagasPreenchidas');
+        const minhasVagasEl = document.getElementById('minhasVagas');
+        const proprietarioBadge = document.getElementById('proprietarioBadge');
+        const legendaProprietario = document.getElementById('legendaProprietario');
+        const statsProprietario = document.getElementById('statsProprietario');
+        const vagasContent = document.getElementById('vagasContent');
+        
+        // Modal
+        const modalOverlay = document.getElementById('modalProprietario');
+        const emailProp = document.getElementById('emailProp');
+        const senhaProp = document.getElementById('senhaProp');
+        const btnLoginProp = document.getElementById('btnLoginProp');
+        const btnCancelProp = document.getElementById('btnCancelProp');
+        const mensagemModal = document.getElementById('mensagemModal');
+        const cadeadoBtn = document.getElementById('cadeadoBtn');
+
+        // ============================================
+        // FUNÇÕES
+        // ============================================
+        function showMessage(text, type = 'info') {
+            messageEl.textContent = text;
+            messageEl.className = `message show ${type}`;
+            setTimeout(() => {
+                messageEl.className = 'message';
+            }, 4000);
+        }
+
+        function getVagaKey(dia, turnoIndex, vagaIndex) {
+            return `${dia}/turno${turnoIndex}/vaga${vagaIndex}`;
+        }
+
+        function gerarUid() {
+            return 'uid_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+        }
+
+        function inicializarVagas() {
+            const ref = database.ref('vagas');
+            ref.once('value', (snapshot) => {
+                if (!snapshot.exists()) {
+                    const estrutura = {};
+                    DIAS.forEach(dia => {
+                        estrutura[dia] = {};
+                        TURNOS.forEach((_, turnoIndex) => {
+                            estrutura[dia][`turno${turnoIndex}`] = {};
+                            for (let v = 0; v < VAGAS_POR_TURNO; v++) {
+                                estrutura[dia][`turno${turnoIndex}`][`vaga${v}`] = null;
+                            }
+                        });
+                    });
+                    ref.set(estrutura);
+                }
+            });
+        }
+
+        function carregarVagas() {
+            const ref = database.ref('vagas');
+            ref.on('value', (snapshot) => {
+                vagasData = snapshot.val() || {};
+                renderizarVagas();
+                atualizarStats();
+            });
+        }
+
+        function renderizarVagas() {
+            let html = '';
+            let total = 0;
+            let preenchidas = 0;
+            let minhas = 0;
+
+            DIAS.forEach(dia => {
+                html += `<div class="dia-section">`;
+                html += `<div class="dia-title">📅 ${DIAS_LABEL[dia]}</div>`;
+                html += `<div class="turnos-grid">`;
+
+                TURNOS.forEach((turnoLabel, turnoIndex) => {
+                    html += `<div class="turno-card">`;
+                    html += `<div class="turno-header">${turnoLabel}</div>`;
+
+                    const turnoData = vagasData[dia]?.[`turno${turnoIndex}`] || {};
+
+                    for (let v = 0; v < VAGAS_POR_TURNO; v++) {
+                        const vagaKey = `vaga${v}`;
+                        const vaga = turnoData[vagaKey] || null;
+                        total++;
+
+                        let classe = 'vaga-item';
+                        let displayText = `Vaga ${v+1}`;
+                        let tooltipHtml = '';
+                        let onClick = '';
+
+                        if (vaga) {
+                            preenchidas++;
+                            const isMinha = usuarioAtual && vaga.uid === meuUid;
+                            
+                            if (isMinha) {
+                                classe += ' preenchida-por-mim';
+                                displayText = `👤 ${vaga.nome}`;
+                                minhas++;
+                                onClick = `onclick="liberarVaga('${dia}', ${turnoIndex}, ${v})"`;
+                            } else {
+                                classe += ' preenchida';
+                                displayText = `✅ ${vaga.nome}`;
+                            }
+
+                            if (isProprietario) {
+                                tooltipHtml = `
+                                    <div class="tooltip">
+                                        <strong>${vaga.nome}</strong><br>
+                                        📞 ${vaga.telefone || 'Não informado'}<br>
+                                        🏛️ ${vaga.congregacao || 'Não informada'}<br>
+                                        <span style="font-size:0.75em;color:#bdc3c7;">🆔 ${vaga.uid || ''}</span>
+                                    </div>
+                                `;
+                            } else if (isMinha) {
+                                tooltipHtml = `
+                                    <div class="tooltip">
+                                        <strong>${vaga.nome}</strong><br>
+                                        📞 ${vaga.telefone || 'Não informado'}<br>
+                                        🏛️ ${vaga.congregacao || 'Não informada'}<br>
+                                        <span style="font-size:0.75em;color:#bdc3c7;">✅ Sua vaga</span>
+                                    </div>
+                                `;
+                            }
+                        } else {
+                            classe += ' disponivel';
+                            if (usuarioAtual) {
+                                displayText = `📋 Vaga ${v+1}`;
+                                onClick = `onclick="ocuparVaga('${dia}', ${turnoIndex}, ${v})"`;
+                            } else {
+                                displayText = `🔒 Vaga ${v+1}`;
+                            }
+                        }
+
+                        html += `<div class="${classe}" id="vaga-${dia}_turno${turnoIndex}_vaga${v}" ${onClick}>
+                            ${displayText}
+                            ${tooltipHtml}
+                        </div>`;
+                    }
+
+                    html += `</div>`;
+                });
+
+                html += `</div></div>`;
+            });
+
+            vagasContent.innerHTML = html;
+        }
+
+        function atualizarStats() {
+            let total = 0;
+            let preenchidas = 0;
+            let minhas = 0;
+
+            DIAS.forEach(dia => {
+                TURNOS.forEach((_, turnoIndex) => {
+                    const turnoData = vagasData[dia]?.[`turno${turnoIndex}`] || {};
+                    for (let v = 0; v < VAGAS_POR_TURNO; v++) {
+                        total++;
+                        const vaga = turnoData[`vaga${v}`] || null;
+                        if (vaga) {
+                            preenchidas++;
+                            if (vaga.uid === meuUid) minhas++;
+                        }
+                    }
+                });
+            });
+
+            totalVagasEl.textContent = total;
+            vagasPreenchidasEl.textContent = preenchidas;
+            minhasVagasEl.textContent = minhas;
+        }
+
+        // ============================================
+        // OCUPAR / LIBERAR VAGA
+        // ============================================
+        function ocuparVaga(dia, turnoIndex, vagaIndex) {
+            if (!usuarioAtual) {
+                showMessage('Você precisa se identificar primeiro!', 'error');
+                return;
+            }
+
+            const path = getVagaKey(dia, turnoIndex, vagaIndex);
+            const ref = database.ref(`vagas/${path}`);
+
+            ref.once('value', (snapshot) => {
+                if (snapshot.exists() && snapshot.val() !== null) {
+                    showMessage('Esta vaga já foi ocupada por outro voluntário!', 'error');
+                    return;
+                }
+
+                const jaTemVaga = verificarVagaNoTurno(dia, turnoIndex);
+                if (jaTemVaga) {
+                    showMessage('Você já tem uma vaga neste turno! Libere a atual antes de ocupar outra.', 'warning');
+                    return;
+                }
+
+                const dadosVaga = {
+                    nome: usuarioAtual.nome,
+                    telefone: usuarioAtual.telefone,
+                    congregacao: usuarioAtual.congregacao,
+                    uid: meuUid,
+                    data: new Date().toISOString()
+                };
+
+                ref.set(dadosVaga)
+                    .then(() => {
+                        showMessage(`✅ Vaga ocupada com sucesso por ${usuarioAtual.nome}!`, 'success');
+                    })
+                    .catch((error) => {
+                        showMessage('Erro ao ocupar vaga: ' + error.message, 'error');
+                    });
+            });
+        }
+
+        function liberarVaga(dia, turnoIndex, vagaIndex) {
+            if (!usuarioAtual) return;
+
+            const path = getVagaKey(dia, turnoIndex, vagaIndex);
+            const ref = database.ref(`vagas/${path}`);
+
+            ref.once('value', (snapshot) => {
+                const vaga = snapshot.val();
+                if (!vaga || vaga.uid !== meuUid) {
+                    showMessage('Esta vaga não é sua!', 'error');
+                    return;
+                }
+
+                ref.set(null)
+                    .then(() => {
+                        showMessage('🗑️ Vaga liberada com sucesso!', 'info');
+                    })
+                    .catch((error) => {
+                        showMessage('Erro ao liberar vaga: ' + error.message, 'error');
+                    });
+            });
+        }
+
+        function verificarVagaNoTurno(dia, turnoIndex) {
+            const turnoData = vagasData[dia]?.[`turno${turnoIndex}`] || {};
+            for (let v = 0; v < VAGAS_POR_TURNO; v++) {
+                const vaga = turnoData[`vaga${v}`] || null;
+                if (vaga && vaga.uid === meuUid) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // ============================================
+        // LOGIN DO USUÁRIO
+        // ============================================
+        function fazerLogin() {
+            const nome = nomeInput.value.trim();
+            const telefone = telefoneInput.value.trim();
+            const congregacao = congregacaoInput.value.trim();
+
+            let isValid = true;
+            if (!nome) { nomeInput.classList.add('error'); isValid = false; } 
+            else { nomeInput.classList.remove('error'); }
+
+            if (!telefone) { telefoneInput.classList.add('error'); isValid = false; } 
+            else { telefoneInput.classList.remove('error'); }
+
+            if (!congregacao) { congregacaoInput.classList.add('error'); isValid = false; } 
+            else { congregacaoInput.classList.remove('error'); }
+
+            if (!isValid) {
+                showMessage('Por favor, preencha todos os campos obrigatórios!', 'error');
+                return;
+            }
+
+            meuUid = gerarUid();
+
+            usuarioAtual = {
+                nome,
+                telefone,
+                congregacao,
+                uid: meuUid,
+                isProprietario: false
+            };
+
+            isProprietario = false;
+            
+            // Mostrar conteúdo principal
+            loginScreen.classList.add('hidden');
+            mainContent.classList.add('show');
+            
+            atualizarUI();
+            showMessage(`✅ Bem-vindo(a), ${nome}!`, 'success');
+            renderizarVagas();
+        }
+
+        // ============================================
+        // LOGIN DO PROPRIETÁRIO (MODAL)
+        // ============================================
+        function abrirModal() {
+            modalOverlay.classList.add('show');
+            senhaProp.value = '';
+            mensagemModal.className = 'mensagem-modal';
+            mensagemModal.textContent = '';
+            senhaProp.classList.remove('error');
+            senhaProp.focus();
+        }
+
+        function fecharModal() {
+            modalOverlay.classList.remove('show');
+            mensagemModal.className = 'mensagem-modal';
+            mensagemModal.textContent = '';
+            senhaProp.classList.remove('error');
+        }
+
+        function fazerLoginProprietario() {
+            const email = emailProp.value.trim();
+            const senha = senhaProp.value.trim();
+
+            if (!senha) {
+                mensagemModal.className = 'mensagem-modal erro';
+                mensagemModal.textContent = '⚠️ Digite a senha do proprietário!';
+                senhaProp.classList.add('error');
+                return;
+            }
+
+            if (email !== PROPRIETARIO_EMAIL) {
+                mensagemModal.className = 'mensagem-modal erro';
+                mensagemModal.textContent = '⚠️ E-mail incorreto!';
+                return;
+            }
+
+            if (senha !== PROPRIETARIO_SENHA) {
+                mensagemModal.className = 'mensagem-modal erro';
+                mensagemModal.textContent = '⚠️ Senha incorreta! Tente novamente.';
+                senhaProp.classList.add('error');
+                senhaProp.value = '';
+                senhaProp.focus();
+                return;
+            }
+
+            // Login com Firebase Auth
+            auth.signInWithEmailAndPassword(email, senha)
+                .then((userCredential) => {
+                    const user = userCredential.user;
+                    meuUid = user.uid;
+                    
+                    usuarioAtual = {
+                        nome: 'Nelson Picos',
+                        telefone: 'Administrador',
+                        congregacao: 'Proprietário',
+                        uid: meuUid,
+                        isProprietario: true,
+                        email: email
+                    };
+
+                    isProprietario = true;
+                    fecharModal();
+                    
+                    // Se não estiver logado como usuário, mostra o conteúdo
+                    if (!loginScreen.classList.contains('hidden')) {
+                        loginScreen.classList.add('hidden');
+                        mainContent.classList.add('show');
+                    }
+                    
+                    atualizarUI();
+                    showMessage('👑 Modo Proprietário ativado!', 'success');
+                    renderizarVagas();
+                })
+                .catch((error) => {
+                    mensagemModal.className = 'mensagem-modal erro';
+                    mensagemModal.textContent = '⚠️ Erro no login: ' + error.message;
+                });
+        }
+
+        // ============================================
+        // ATUALIZAR UI
+        // ============================================
+        function atualizarUI() {
+            if (usuarioAtual) {
+                const nome = usuarioAtual.nome;
+                const telefone = usuarioAtual.telefone;
+                const congregacao = usuarioAtual.congregacao;
+                const isProp = usuarioAtual.isProprietario;
+
+                let badgeText = `👤 ${nome}`;
+                if (isProp) {
+                    badgeText += ` 👑 PROPRIETÁRIO`;
+                    userBadge.className = 'user-badge proprietario';
+                    proprietarioBadge.style.display = 'block';
+                    legendaProprietario.style.display = 'block';
+                    statsProprietario.style.display = 'inline';
+                    cadeadoBtn.className = 'cadeado-btn proprietario';
+                    cadeadoBtn.textContent = '🔓';
+                    userTipo.textContent = '👑 Modo Proprietário';
+                } else {
+                    badgeText += ` • 📞 ${telefone} • 🏛️ ${congregacao}`;
+                    userBadge.className = 'user-badge';
+                    proprietarioBadge.style.display = 'none';
+                    legendaProprietario.style.display = 'none';
+                    statsProprietario.style.display = 'none';
+                    cadeadoBtn.className = 'cadeado-btn';
+                    cadeadoBtn.textContent = '🔒';
+                    userTipo.textContent = '👤 Voluntário';
+                }
+
+                userBadge.textContent = badgeText;
+
+                localStorage.setItem('usuarioVoluntario', JSON.stringify(usuarioAtual));
+                localStorage.setItem('meuUid', meuUid);
+                localStorage.setItem('isProprietario', JSON.stringify(isProp));
+            }
+        }
+
+        // ============================================
+        // LOGOUT
+        // ============================================
+        function fazerLogout() {
+            if (isProprietario) {
+                auth.signOut();
+            }
+
+            usuarioAtual = null;
+            meuUid = null;
+            isProprietario = false;
+
+            // Voltar para tela de login
+            loginScreen.classList.remove('hidden');
+            mainContent.classList.remove('show');
+            
+            proprietarioBadge.style.display = 'none';
+            legendaProprietario.style.display = 'none';
+            statsProprietario.style.display = 'none';
+            cadeadoBtn.className = 'cadeado-btn';
+            cadeadoBtn.textContent = '🔒';
+            userBadge.className = 'user-badge';
+            btnEntrar.disabled = false;
+
+            localStorage.removeItem('usuarioVoluntario');
+            localStorage.removeItem('meuUid');
+            localStorage.removeItem('isProprietario');
+
+            showMessage('👋 Você saiu.', 'info');
+        }
+
+        // ============================================
+        // VERIFICAR SESSÃO SALVA
+        // ============================================
+        function verificarSessao() {
+            const saved = localStorage.getItem('usuarioVoluntario');
+            const savedUid = localStorage.getItem('meuUid');
+            const savedIsProp = localStorage.getItem('isProprietario');
+            
+            if (saved && savedUid) {
+                try {
+                    const usuario = JSON.parse(saved);
+                    usuarioAtual = usuario;
+                    meuUid = savedUid;
+                    isProprietario = savedIsProp === 'true';
+
+                    // Mostra o conteúdo principal
+                    loginScreen.classList.add('hidden');
+                    mainContent.classList.add('show');
+
+                    if (isProprietario) {
+                        auth.onAuthStateChanged((user) => {
+                            if (user) {
+                                atualizarUI();
+                            } else {
+                                fazerLogout();
+                            }
+                        });
+                    } else {
+                        atualizarUI();
+                    }
+                    renderizarVagas();
+                } catch (e) {
+                    localStorage.removeItem('usuarioVoluntario');
+                    localStorage.removeItem('meuUid');
+                    localStorage.removeItem('isProprietario');
+                }
+            } else {
+                // Tela de login visível, conteúdo escondido
+                loginScreen.classList.remove('hidden');
+                mainContent.classList.remove('show');
+            }
+        }
+
+        // ============================================
+        // EXPOR FUNÇÕES
+        // ============================================
+        window.ocuparVaga = ocuparVaga;
+        window.liberarVaga = liberarVaga;
+
+        // ============================================
+        // EVENT LISTENERS
+        // ============================================
+        btnEntrar.addEventListener('click', fazerLogin);
+        btnSair.addEventListener('click', fazerLogout);
+        
+        cadeadoBtn.addEventListener('click', () => {
+            if (isProprietario) {
+                // Se já é proprietário, faz logout do proprietário (mas mantém login do usuário)
+                if (usuarioAtual && usuarioAtual.isProprietario) {
+                    // Só desativa o modo proprietário
+                    isProprietario = false;
+                    usuarioAtual.isProprietario = false;
+                    localStorage.setItem('isProprietario', 'false');
+                    atualizarUI();
+                    renderizarVagas();
+                    showMessage('👑 Modo proprietário desativado', 'info');
+                }
+            } else {
+                abrirModal();
+            }
+        });
+
+        btnLoginProp.addEventListener('click', fazerLoginProprietario);
+        btnCancelProp.addEventListener('click', fecharModal);
+
+        senhaProp.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                fazerLoginProprietario();
+            }
+        });
+
+        [nomeInput, telefoneInput, congregacaoInput].forEach(input => {
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    fazerLogin();
+                }
+            });
+            input.addEventListener('input', () => {
+                input.classList.remove('error');
+            });
+        });
+
+        // Fechar modal clicando fora
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) {
+                fecharModal();
+            }
+        });
+
+        // ============================================
+        // INICIALIZAR APP
+        // ============================================
+        function init() {
+            verificarSessao();
+            inicializarVagas();
+            carregarVagas();
+        }
+
+        init();
+    </script>
+</body>
+</html>
