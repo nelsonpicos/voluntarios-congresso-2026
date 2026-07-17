@@ -899,9 +899,10 @@
         }
 
         // ============================================
-        // BUSCAR USUÁRIO NO FIREBASE
+        // BUSCAR USUÁRIO NO FIREBASE (CORRIGIDO)
         // ============================================
         function buscarUsuarioPorTelefone(telefone) {
+            // 🔥 EXTRAI APENAS OS NÚMEROS PARA COMPARAR
             const telefoneLimpo = limparMascara(telefone);
             
             if (telefoneLimpo.length < 10) {
@@ -914,6 +915,7 @@
                 return;
             }
 
+            // 🔥 BUSCA PELO TELEFONE LIMPO (APENAS NÚMEROS)
             const ref = database.ref('usuarios');
             ref.orderByChild('telefone').equalTo(telefoneLimpo).once('value')
                 .then((snapshot) => {
