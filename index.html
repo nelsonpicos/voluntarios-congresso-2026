@@ -10,6 +10,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     
     <style>
+        /* ===== TODOS OS ESTILOS (MANTIDOS) ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -80,7 +81,7 @@
             display: inline-block;
         }
         
-        /* MODAL PROPRIETÁRIO */
+        /* MODAIS */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -531,7 +532,7 @@
             justify-content: center;
         }
 
-        /* CÉLULA DE VAGA - ESTILOS GERAIS */
+        /* CÉLULA DE VAGA */
         .vaga-item {
             background: #f8f9fa;
             border: 2px solid #e9ecef;
@@ -549,7 +550,6 @@
             font-size: 0.85em;
         }
 
-        /* Vaga disponível (modo comum) */
         .vaga-item.disponivel {
             cursor: pointer;
             background: #f8f9fa;
@@ -562,7 +562,6 @@
             transform: scale(1.02);
         }
 
-        /* Vaga preenchida por outro (modo comum) */
         .vaga-item.preenchida {
             background: #d5f5e3;
             border-color: #27ae60;
@@ -570,7 +569,6 @@
             font-weight: 500;
         }
 
-        /* Vaga preenchida por mim (modo comum) */
         .vaga-item.preenchida-por-mim {
             background: #fdebd0;
             border-color: #e67e22;
@@ -582,7 +580,6 @@
             transform: scale(1.02);
         }
 
-        /* Vaga preenchida para ADMIN - com botões lado a lado */
         .vaga-item.vaga-admin {
             background: #d5f5e3;
             border-color: #8e44ad;
@@ -590,7 +587,7 @@
             padding: 4px 6px;
             gap: 4px;
             justify-content: space-between;
-            flex-wrap: nowrap; /* NUNCA QUEBRAR LINHA */
+            flex-wrap: nowrap;
         }
         .vaga-item.vaga-admin .btn-admin-ver {
             background: #3498db;
@@ -603,7 +600,6 @@
             transition: all 0.2s;
             line-height: 1.4;
             flex-shrink: 0;
-            order: 0;
         }
         .vaga-item.vaga-admin .btn-admin-ver:hover {
             background: #2980b9;
@@ -620,7 +616,6 @@
             transition: all 0.2s;
             line-height: 1.4;
             flex-shrink: 0;
-            order: 2;
         }
         .vaga-item.vaga-admin .btn-admin-limpar:hover {
             background: #c0392b;
@@ -631,11 +626,6 @@
             text-align: center;
             font-weight: 500;
             font-size: 0.85em;
-            order: 1;
-            min-width: 0;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
             padding: 0 2px;
         }
 
@@ -672,16 +662,13 @@
             }
             .login-form { padding: 20px; }
             .dia-title { flex-direction: column; text-align: center; }
-            
-            /* 🔥 CORREÇÃO: botões lado a lado no celular 🔥 */
             .vaga-item.vaga-admin {
-                flex-wrap: nowrap !important; /* Força uma linha */
+                flex-wrap: nowrap !important;
                 gap: 4px;
                 padding: 4px 6px;
             }
             .vaga-item.vaga-admin .vaga-nome-admin {
                 flex: 1 1 auto;
-                order: 0 !important;
                 font-size: 0.7em;
                 text-align: center;
                 white-space: nowrap;
@@ -692,7 +679,6 @@
             }
             .vaga-item.vaga-admin .btn-admin-ver,
             .vaga-item.vaga-admin .btn-admin-limpar {
-                order: 0 !important;
                 flex-shrink: 0;
                 font-size: 0.65em;
                 padding: 2px 5px;
@@ -974,7 +960,7 @@
         }
 
         // ============================================
-        // RENDERIZAR VAGAS
+        // RENDERIZAR VAGAS (ADMIN NÃO OCUPA)
         // ============================================
         function renderizarVagas() {
             let html = '';
@@ -997,7 +983,6 @@
 
                         let classe = 'vaga-item';
                         let displayText = `Vaga ${v+1}`;
-                        let onClick = '';
                         let htmlInterno = '';
 
                         if (vaga) {
@@ -1006,6 +991,7 @@
                             const isProp = usuarioAtual && usuarioAtual.isProprietario;
 
                             if (isProp) {
+                                // ADMIN: exibe botões
                                 classe += ' vaga-admin';
                                 const nomeVoluntario = vaga.nome || 'Voluntário';
                                 htmlInterno = `
@@ -1015,25 +1001,32 @@
                                 `;
                                 classe += ' admin-item';
                             } else if (isMinha) {
+                                // MINHA VAGA: clica para liberar
                                 classe += ' preenchida-por-mim';
                                 displayText = `👤 ${vaga.nome}`;
                                 minhas++;
-                                onClick = `onclick="liberarVaga('${dia}',${turnoIndex},${v})"`;
                             } else {
+                                // VAGA DE OUTRO (usuário comum não pode liberar)
                                 classe += ' preenchida';
                                 displayText = `✅ ${vaga.nome}`;
                             }
                         } else {
+                            // VAGA DISPONÍVEL
                             classe += ' disponivel';
-                            if (usuarioAtual) {
+                            if (isProprietario) {
+                                // ADMIN: NÃO ocupa vagas, apenas visualiza
                                 displayText = `📋 Vaga ${v+1}`;
-                                onClick = `onclick="ocuparVaga('${dia}',${turnoIndex},${v})"`;
+                            } else if (usuarioAtual) {
+                                // USUÁRIO COMUM: pode ocupar
+                                displayText = `📋 Vaga ${v+1}`;
                             } else {
+                                // NÃO LOGADO
                                 displayText = `🔒 Vaga ${v+1}`;
                             }
                         }
 
-                        html += `<div class="${classe}" ${onClick ? `onclick="${onClick}"` : ''} data-dia="${dia}" data-turno="${turnoIndex}" data-vaga="${v}">`;
+                        // Montar o elemento
+                        html += `<div class="${classe}" data-dia="${dia}" data-turno="${turnoIndex}" data-vaga="${v}">`;
                         if (htmlInterno) {
                             html += htmlInterno;
                         } else {
@@ -1050,10 +1043,57 @@
         }
 
         // ============================================
-        // OCUPAR / LIBERAR VAGA (VOLUNTÁRIO)
+        // DELEGAÇÃO DE EVENTOS PARA CLIQUE EM VAGAS
+        // ============================================
+        document.addEventListener('click', function(e) {
+            // 1. Verificar se o clique foi em uma vaga disponível
+            const vagaItem = e.target.closest('.vaga-item.disponivel');
+            if (vagaItem && !e.target.closest('.btn-admin-ver') && !e.target.closest('.btn-admin-limpar')) {
+                // Se for administrador, NÃO ocupa vaga
+                if (isProprietario) {
+                    showMessage('Administrador não pode ocupar vagas. Use os botões 👁️ e 🗑️.', 'warning');
+                    return;
+                }
+                // Se não estiver logado, pede login
+                if (!usuarioAtual) {
+                    showMessage('Você precisa se identificar primeiro!', 'error');
+                    return;
+                }
+                // Usuário comum: ocupa a vaga
+                const dia = vagaItem.dataset.dia;
+                const turno = parseInt(vagaItem.dataset.turno);
+                const vaga = parseInt(vagaItem.dataset.vaga);
+                if (dia && !isNaN(turno) && !isNaN(vaga)) {
+                    ocuparVaga(dia, turno, vaga);
+                }
+                return;
+            }
+
+            // 2. Verificar se o clique foi em uma vaga "minha vaga" (para liberar)
+            const minhaVaga = e.target.closest('.vaga-item.preenchida-por-mim');
+            if (minhaVaga && !e.target.closest('.btn-admin-ver') && !e.target.closest('.btn-admin-limpar')) {
+                // Se for administrador, NÃO libera vaga (usa botão)
+                if (isProprietario) {
+                    showMessage('Administrador: use o botão 🗑️ para limpar vagas.', 'warning');
+                    return;
+                }
+                const dia = minhaVaga.dataset.dia;
+                const turno = parseInt(minhaVaga.dataset.turno);
+                const vaga = parseInt(minhaVaga.dataset.vaga);
+                if (dia && !isNaN(turno) && !isNaN(vaga)) {
+                    liberarVaga(dia, turno, vaga);
+                }
+                return;
+            }
+        });
+
+        // ============================================
+        // OCUPAR VAGA (USUÁRIO COMUM)
         // ============================================
         function ocuparVaga(dia, turnoIndex, vagaIndex) {
             if (!usuarioAtual) { showMessage('Você precisa se identificar primeiro!', 'error'); return; }
+            if (isProprietario) { showMessage('Administrador não pode ocupar vagas.', 'warning'); return; }
+            
             const path = getVagaKey(dia, turnoIndex, vagaIndex);
             const ref = database.ref(`vagas/${path}`);
             ref.once('value', (snapshot) => {
@@ -1079,8 +1119,13 @@
             });
         }
 
+        // ============================================
+        // LIBERAR VAGA (USUÁRIO COMUM - PRÓPRIA VAGA)
+        // ============================================
         function liberarVaga(dia, turnoIndex, vagaIndex) {
             if (!usuarioAtual) return;
+            if (isProprietario) { showMessage('Administrador: use o botão 🗑️ para limpar.', 'warning'); return; }
+            
             const path = getVagaKey(dia, turnoIndex, vagaIndex);
             const ref = database.ref(`vagas/${path}`);
             ref.once('value', (snapshot) => {
@@ -1394,7 +1439,7 @@
         }
 
         // ============================================
-        // EVENTOS (DELEGADOS)
+        // EVENTOS (DELEGADOS PARA BOTÕES ADMIN)
         // ============================================
         document.addEventListener('click', function(e) {
             const verBtn = e.target.closest('.btn-admin-ver');
